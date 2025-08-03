@@ -14,11 +14,11 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  { label: "Jobs", icon: Briefcase, href: "/jobs" },
-  { label: "Clients", icon: Users, href: "/clients" },
-  { label: "Invoices", icon: FileText, href: "/invoices" },
-  { label: "Settings", icon: Settings, href: "/settings" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
+  { label: "Jobs", icon: Briefcase, href: "/admin/jobs" },
+  { label: "Clients", icon: Users, href: "/admin/clients" },
+  { label: "Invoices", icon: FileText, href: "/admin/invoices" },
+  { label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 export default function Sidebar() {
@@ -87,7 +87,7 @@ export default function Sidebar() {
                     {isActive && (
                       <motion.div
                         layoutId="activeTab"
-                        className="ml-auto h-1 w-1 rounded-full bg-gold"
+                        className="ml-auto h-2 w-2 rounded-full bg-gold"
                       />
                     )}
                   </a>
