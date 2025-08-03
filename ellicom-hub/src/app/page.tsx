@@ -2,7 +2,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Home() {
   return (
-    <main className="min-h-screen p-8 bg-ground dark:bg-background text-sea dark:text-textPrimary transition-colors">
+    <main className="flex-1 min-h-screen p-8 bg-ground dark:bg-background text-sea dark:text-textPrimary transition-colors">
       <h1 className="text-4xl font-bold mb-4 text-gold dark:text-head">
         Ellicom Home Page
       </h1>
