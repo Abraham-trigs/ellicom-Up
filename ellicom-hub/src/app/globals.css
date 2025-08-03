@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth transitions */
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* body {
+  @apply text-sea dark:text-textPrimary;
+} */
