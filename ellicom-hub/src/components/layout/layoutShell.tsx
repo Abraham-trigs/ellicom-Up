@@ -13,9 +13,9 @@ export default function LayoutShell({
       {/* Navbar always at the top */}
       <Navbar />
 
-      {/* Content area below navbar */}
-      <div className="flex flex-1 min-h-0">
-        {/* Sidebar on the left (on desktop) */}
+      {/* Content area adapts between mobile (stacked) and desktop (side-by-side) */}
+      <div className="flex flex-1 flex-col md:flex-row min-h-0">
+        {/* Sidebar — mobile dropdown pushes content, desktop locks left */}
         <Sidebar />
 
         {/* Main content */}
