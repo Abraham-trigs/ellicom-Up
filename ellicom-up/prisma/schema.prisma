@@ -1,3 +1,13 @@
+// Required to support custom seed script
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator seed {
+  provider = "ts-node"
+}
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,50 +17,84 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model customers {
-  id        String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name      String @db.VarChar(255)
-  email     String @db.VarChar(255)
-  image_url String @db.VarChar(255)
-}
-
-model invoices {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  customer_id String   @db.Uuid
-  amount      Int
-  status      String   @db.VarChar(255)
-  date        DateTime @db.Date
-}
-
-model revenue {
-  month   String @unique @db.VarChar(4)
-  revenue Int
-}
-
-model users {
-  id       String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name     String @db.VarChar(255)
-  email    String @unique
-  password String
-}
-
-
-
-
-
-
-model Role {
-  id    String  @id @default(uuid())
-  name  String  @unique
-  users User[]
-}
-
 model User {
-  id        String   @id @default(uuid())
+  id        String    @id @default(cuid())
   name      String
-  email     String   @unique
-  role      Role     @relation(fields: [roleId], references: [id])
-  roleId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  email     String    @unique
+  password  String
+  phone     String?   @unique
+  role      Role      @default(CLIENT)
+  avatarUrl String? // optional profile pic
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete marker
+
+  // Relations (future-ready)
+  jobs     Job[] // One user can create many jobs
+  invoices Invoice[] // If clients will see their invoices
+
+  @@map("users") // Optional: custom table name
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  status      JobStatus @default(PENDING)
+  type        JobType
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  submittedBy String
+  deletedAt   DateTime?
+
+  // Relations
+  user    User     @relation(fields: [submittedBy], references: [id], onDelete: Cascade)
+  Invoice Invoice?
+
+  @@map("jobs")
+}
+
+model Invoice {
+  id        String        @id @default(cuid())
+  jobId     String        @unique
+  amount    Float
+  status    InvoiceStatus @default(UNPAID)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // Relations
+  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("invoices")
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  SECRETARY
+  STAFF
+  CLIENT
+}
+
+enum JobType {
+  PHOTOCOPY
+  PRINTING
+  LARGE_FORMAT
+  SCANNING
+}
+
+enum JobStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PAID
+  CANCELLED
 }

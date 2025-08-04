@@ -1,55 +1,74 @@
-import { PrismaClient } from '@prisma/client';
-
+// prisma/seed.ts
+import { PrismaClient, Role, JobStatus, JobType, InvoiceStatus } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create roles
-  const superAdminRole = await prisma.role.upsert({
-    where: { name: 'SuperAdmin' },
-    update: {},
-    create: { name: 'SuperAdmin' },
-  });
+  console.log("🌱 Seeding DB...");
 
-  const adminRole = await prisma.role.upsert({
-    where: { name: 'Admin' },
-    update: {},
-    create: { name: 'Admin' },
-  });
-
-  const secretaryRole = await prisma.role.upsert({
-    where: { name: 'Secretary' },
-    update: {},
-    create: { name: 'Secretary' },
-  });
-
-  const staffRole = await prisma.role.upsert({
-    where: { name: 'Staff' },
-    update: {},
-    create: { name: 'Staff' },
-  });
-
-  // Create users
-  await prisma.user.upsert({
-    where: { email: 'super@ellicom.com' },
+  // Create Admin
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@ellicom.com" },
     update: {},
     create: {
-      name: 'Super Abraham',
-      email: 'super@ellicom.com',
-      roleId: superAdminRole.id,
+      name: "Admin CEO",
+      email: "admin@ellicom.com",
+      password: "hashedpassword", // hash in real life
+      phone: "0550001111",
+      role: Role.ADMIN,
+      avatarUrl: "https://ui-avatars.com/api/?name=Admin+CEO",
     },
   });
 
-  await prisma.user.upsert({
-    where: { email: 'ceo@ellicom.com' },
-    update: {},
-    create: {
-      name: 'The CEO',
-      email: 'ceo@ellicom.com',
-      roleId: adminRole.id,
+  // Create Client
+  const client = await prisma.user.create({
+    data: {
+      name: "Kwame Client",
+      email: "client@ellicom.com",
+      password: "hashedpassword",
+      role: Role.CLIENT,
+      phone: "0552223333",
     },
   });
 
-  console.log('✅ Seed data added successfully.');
+  // Create Jobs
+  const job1 = await prisma.job.create({
+    data: {
+      title: "Print business cards",
+      description: "300 GSM matte finish, double-sided",
+      type: JobType.PRINTING,
+      status: JobStatus.IN_PROGRESS,
+      submittedBy: client.id,
+    },
+  });
+
+  const job2 = await prisma.job.create({
+    data: {
+      title: "Photocopy 200 pages",
+      type: JobType.PHOTOCOPY,
+      status: JobStatus.PENDING,
+      submittedBy: client.id,
+    },
+  });
+
+  // Create Invoices
+  await prisma.invoice.createMany({
+    data: [
+      {
+        jobId: job1.id,
+        userId: client.id,
+        amount: 120.5,
+        status: InvoiceStatus.UNPAID,
+      },
+      {
+        jobId: job2.id,
+        userId: client.id,
+        amount: 45.0,
+        status: InvoiceStatus.PAID,
+      },
+    ],
+  });
+
+  console.log("✅ Seeding complete");
 }
 
 main()
@@ -57,6 +76,4 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(() => prisma.$disconnect());
