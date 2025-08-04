@@ -11,6 +11,8 @@ import {
   Settings,
   Menu,
   X,
+  Boxes,
+  UserCog,
 } from "lucide-react";
 
 const navItems = [
@@ -18,6 +20,8 @@ const navItems = [
   { label: "Jobs", icon: Briefcase, href: "/admin/jobs" },
   { label: "Clients", icon: Users, href: "/admin/clients" },
   { label: "Invoices", icon: FileText, href: "/admin/invoices" },
+  { label: "Projects", icon: Boxes, href: "/admin/projects" },
+  { label: "Team", icon: UserCog, href: "/admin/team" },
   { label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
