@@ -1,74 +1,29 @@
-// prisma/seed.ts
-import { PrismaClient, Role, JobStatus, JobType, InvoiceStatus } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding DB...");
+  await prisma.user.deleteMany(); // Optional: clear users for clean seed
 
-  // Create Admin
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@ellicom.com" },
-    update: {},
-    create: {
-      name: "Admin CEO",
-      email: "admin@ellicom.com",
-      password: "hashedpassword", // hash in real life
-      phone: "0550001111",
-      role: Role.ADMIN,
-      avatarUrl: "https://ui-avatars.com/api/?name=Admin+CEO",
-    },
-  });
-
-  // Create Client
-  const client = await prisma.user.create({
-    data: {
-      name: "Kwame Client",
-      email: "client@ellicom.com",
-      password: "hashedpassword",
-      role: Role.CLIENT,
-      phone: "0552223333",
-    },
-  });
-
-  // Create Jobs
-  const job1 = await prisma.job.create({
-    data: {
-      title: "Print business cards",
-      description: "300 GSM matte finish, double-sided",
-      type: JobType.PRINTING,
-      status: JobStatus.IN_PROGRESS,
-      submittedBy: client.id,
-    },
-  });
-
-  const job2 = await prisma.job.create({
-    data: {
-      title: "Photocopy 200 pages",
-      type: JobType.PHOTOCOPY,
-      status: JobStatus.PENDING,
-      submittedBy: client.id,
-    },
-  });
-
-  // Create Invoices
-  await prisma.invoice.createMany({
+  await prisma.user.createMany({
     data: [
       {
-        jobId: job1.id,
-        userId: client.id,
-        amount: 120.5,
-        status: InvoiceStatus.UNPAID,
+        name: "Alice Doe",
+        email: "alice@example.com",
+        password: "hashedpassword123",
+        role: Role.CLIENT,
+        phone: "0551234567",
       },
       {
-        jobId: job2.id,
-        userId: client.id,
-        amount: 45.0,
-        status: InvoiceStatus.PAID,
+        name: "Bob Smith",
+        email: "bob@example.com",
+        password: "hashedpassword456",
+        role: Role.CLIENT,
+        phone: "0249876543",
       },
     ],
   });
 
-  console.log("✅ Seeding complete");
+  console.log("✨ Clients seeded!");
 }
 
 main()

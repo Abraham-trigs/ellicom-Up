@@ -1,53 +1,61 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { JobStatus } from "@prisma/client";
+import Link from "next/link";
 
-interface JobDetailsProps {
-  params: { id: string };
-}
+type Props = {
+  params: {
+    id: string;
+  };
+};
 
-export default async function JobDetailsPage({ params }: JobDetailsProps) {
+export default async function JobDetailPage({ params }: Props) {
   const job = await prisma.job.findUnique({
     where: { id: params.id },
-    include: {
-      user: true,
-      invoice: true, // if you set up reverse relation
-    },
+    include: { user: true },
   });
 
   if (!job) return notFound();
 
   return (
-    <div className="p-6 text-white space-y-6">
-      <h1 className="text-2xl font-bold">{job.title}</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{job.title}</h1>
+        <Link
+          href="/admin/jobs"
+          className="inline-block bg-sea text-white px-4 py-2 rounded hover:bg-darkSea transition"
+        >
+          ← Back to All Jobs
+        </Link>
+      </div>
 
-      <div className="bg-surface p-4 rounded-xl border border-border space-y-2">
+      <div className="border border-border rounded-xl p-6 bg-surface text-white space-y-3">
         <p>
-          <span className="text-textSecondary">Type:</span> {job.type}
+          <strong>Type:</strong> {job.type}
         </p>
         <p>
-          <span className="text-textSecondary">Status:</span> {job.status}
+          <strong>Status:</strong>{" "}
+          <span
+            className={`px-2 py-1 rounded ${
+              job.status === JobStatus.COMPLETED
+                ? "bg-green-600"
+                : job.status === JobStatus.IN_PROGRESS
+                ? "bg-yellow-600"
+                : job.status === JobStatus.CANCELLED
+                ? "bg-red-600"
+                : "bg-blue-600"
+            }`}
+          >
+            {job.status}
+          </span>
         </p>
         <p>
-          <span className="text-textSecondary">Submitted by:</span>{" "}
-          {job.user.name}
+          <strong>Submitted by:</strong> {job.user.name} ({job.user.email})
         </p>
         <p>
-          <span className="text-textSecondary">Submitted on:</span>{" "}
-          {new Date(job.createdAt).toLocaleString()}
+          <strong>Created:</strong>{" "}
+          {new Date(job.createdAt).toLocaleString("en-GB")}
         </p>
-        {job.description && (
-          <p>
-            <span className="text-textSecondary">Description:</span>{" "}
-            {job.description}
-          </p>
-        )}
-        {job.invoice && (
-          <div className="pt-4">
-            <p className="font-semibold">💸 Invoice</p>
-            <p>Status: {job.invoice.status}</p>
-            <p>Amount: GH₵{job.invoice.amount.toFixed(2)}</p>
-          </div>
-        )}
       </div>
     </div>
   );
