@@ -8,7 +8,7 @@ export default function Home() {
       </h1>
 
       <p className="mb-4 text-sea dark:text-textSecondary">
-        Welcome to the hub. Let's build it right.
+        Welcome to the hub. Let us build it right.
       </p>
 
       <div className="p-4 rounded border border-inactive dark:border-border bg-container dark:bg-surface">
