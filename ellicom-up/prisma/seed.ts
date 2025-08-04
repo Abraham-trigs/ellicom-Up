@@ -1,29 +1,30 @@
+// prisma/seed.ts
 import { PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.deleteMany(); // Optional: clear users for clean seed
-
-  await prisma.user.createMany({
+  // Seed Clients
+  const clients = await prisma.user.createMany({
     data: [
       {
-        name: "Alice Doe",
-        email: "alice@example.com",
-        password: "hashedpassword123",
+        name: "Sarah Connor",
+        email: "sarah@example.com",
+        password: "hashed-password-1",
+        phone: "0550011221",
         role: Role.CLIENT,
-        phone: "0551234567",
       },
       {
-        name: "Bob Smith",
-        email: "bob@example.com",
-        password: "hashedpassword456",
+        name: "Kwame Nkrumah",
+        email: "kwame@example.com",
+        password: "hashed-password-2",
+        phone: "0241234567",
         role: Role.CLIENT,
-        phone: "0249876543",
       },
     ],
+    skipDuplicates: true,
   });
 
-  console.log("✨ Clients seeded!");
+  console.log("Seeded clients ✅");
 }
 
 main()
@@ -31,4 +32,6 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
