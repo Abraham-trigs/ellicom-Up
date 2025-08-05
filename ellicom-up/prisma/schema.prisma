@@ -1,78 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
-
-
-
-
-enum JobStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-enum JobType {
-  PHOTOCOPY
-  PRINTING
-  LARGE_FORMAT
-  SCANNING
-  OTHER
-}
-
-model Role {
-  id    String  @id @default(cuid())
-  name  String  @unique
-
-  users User[]
+enum Role {
+  SUPERADMIN
+  ADMIN
+  SECRETARY
+  STAFF
+  CLIENT
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  roleId    String
-  role      Role     @relation(fields: [roleId], references: [id])
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String
+  phone        String?
+  role         Role
+  totalRevenue Decimal  @default(0.0)
+  totalJobs    Int      @default(0)
+  createdAt    DateTime @default(now())
 
-  jobs      Job[]    // Internal jobs submitted by staff
-}
-
-model Client {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?  @unique
-  phone     String?
-  company   String?
-  address   String?
-
-  jobs      Job[]    // External jobs submitted by client
+  // Relations
+  createdJobs  Job[]    @relation("JobsCreated") // jobs created by this user (client or staff)
+  handledJobs  Job[]    @relation("JobsHandled") // jobs assigned to this user (internal only)
 }
 
 model Job {
-  id          String     @id @default(cuid())
-  title       String
-  description String?
-  type        JobType
-  status      JobStatus  @default(PENDING)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  details      String?
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
 
-  // Optional: submitted by internal User
-  userId      String?
-  user        User?       @relation(fields: [userId], references: [id])
+  // Who created the job (any user: client or internal)
+  createdBy     User   @relation("JobsCreated", fields: [createdById], references: [id])
+  createdById   String
 
-  // Optional: submitted by external Client
-  clientId    String?
-  client      Client?     @relation(fields: [clientId], references: [id])
-
-  // Optional future extensions:
-  // invoice     Invoice?   @relation(fields: [invoiceId], references: [id])
-  // invoiceId   String?
+  // Who is handling the job (internal users only: optional)
+  handledBy     User?  @relation("JobsHandled", fields: [handledById], references: [id])
+  handledById   String?
 }

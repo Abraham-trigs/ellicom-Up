@@ -1,10 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { User } from "@prisma/client";
+import { Client } from "@prisma/client";
 
 export default async function ClientsPage() {
-  const clients: User[] = await prisma.user.findMany({
-    where: { role: "CLIENT" },
+  const clients: Client[] = await prisma.client.findMany({
     orderBy: { createdAt: "desc" },
   });
 
@@ -23,6 +22,10 @@ export default async function ClientsPage() {
                 <h2 className="font-semibold text-lg">{client.name}</h2>
                 <p className="text-textSecondary text-sm">
                   {client.email} · {client.phone || "No phone"}
+                </p>
+                <p className="text-textMuted text-xs mt-1">
+                  {client.company || "No company"} ·{" "}
+                  {client.address || "No address"}
                 </p>
               </div>
               <Link
