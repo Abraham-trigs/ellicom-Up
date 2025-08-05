@@ -6,6 +6,7 @@ export default async function AdminJobsPage() {
   const jobs = await prisma.job.findMany({
     include: {
       user: true,
+      client: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -24,7 +25,8 @@ export default async function AdminJobsPage() {
                 <div>
                   <h2 className="font-semibold text-lg">{job.title}</h2>
                   <p className="text-textSecondary text-sm">
-                    Type: {job.type} · Submitted by: {job.user.name}
+                    Type: {job.type} · Submitted by:{" "}
+                    {job.user?.name || job.client?.name || "Unknown"}
                   </p>
                 </div>
                 <span

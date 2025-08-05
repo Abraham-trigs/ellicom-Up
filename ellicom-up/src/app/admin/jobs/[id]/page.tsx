@@ -12,10 +12,19 @@ type Props = {
 export default async function JobDetailPage({ params }: Props) {
   const job = await prisma.job.findUnique({
     where: { id: params.id },
-    include: { user: true },
+    include: {
+      user: true,
+      client: true,
+    },
   });
 
   if (!job) return notFound();
+
+  const submittedBy = job.user
+    ? `${job.user.name} (${job.user.email})`
+    : job.client
+    ? `${job.client.name} (${job.client.email})`
+    : "Unknown";
 
   return (
     <div className="space-y-6">
@@ -50,7 +59,7 @@ export default async function JobDetailPage({ params }: Props) {
           </span>
         </p>
         <p>
-          <strong>Submitted by:</strong> {job.user.name} ({job.user.email})
+          <strong>Submitted by:</strong> {submittedBy}
         </p>
         <p>
           <strong>Created:</strong>{" "}
