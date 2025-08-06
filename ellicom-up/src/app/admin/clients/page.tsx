@@ -1,43 +1,19 @@
-import { prisma } from "@/lib/prisma";
-import Link from "next/link";
-import { Client } from "@prisma/client";
+// app/admin/client/page.tsx
 
-export default async function ClientsPage() {
-  const clients: Client[] = await prisma.client.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-
+export default function ClientPage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">👥 Clients</h1>
+    <div className="min-h-screen px-6 py-10 bg-gray-50 text-gray-900">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">Clients</h1>
+        <p className="text-gray-600">
+          Manage all your clients from this dashboard.
+        </p>
 
-      <ul className="space-y-4">
-        {clients.map((client) => (
-          <li
-            key={client.id}
-            className="border border-border rounded-xl p-4 bg-surface text-white"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="font-semibold text-lg">{client.name}</h2>
-                <p className="text-textSecondary text-sm">
-                  {client.email} · {client.phone || "No phone"}
-                </p>
-                <p className="text-textMuted text-xs mt-1">
-                  {client.company || "No company"} ·{" "}
-                  {client.address || "No address"}
-                </p>
-              </div>
-              <Link
-                href={`/admin/clients/${client.id}`}
-                className="text-sm text-gold hover:underline"
-              >
-                View Details →
-              </Link>
-            </div>
-          </li>
-        ))}
-      </ul>
+        {/* Placeholder content */}
+        <div className="mt-10 border border-dashed border-gray-300 rounded-xl p-10 text-center">
+          <p className="text-gray-400">No clients found.</p>
+        </div>
+      </div>
     </div>
   );
 }

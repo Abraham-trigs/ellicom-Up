@@ -1,42 +1,45 @@
-import { prisma } from "@/lib/prisma";
+// app/admin/stock/[id]/page.tsx
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-export default async function StockDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function StockDetailPage({ params }: Props) {
   const stock = await prisma.stock.findUnique({
-    where: { id: params.id },
+    where: {
+      id: params.id,
+    },
   });
 
-  if (!stock) return notFound();
+  if (!stock) {
+    notFound();
+  }
 
   return (
-    <div className="space-y-6">
-      <Link
-        href="/admin/stocks"
-        className="text-sm text-blue-400 hover:underline"
-      >
-        ← Back to stock list
-      </Link>
+    <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">{stock.name}</h1>
 
-      <div className="border border-border rounded-xl p-6 bg-surface space-y-4">
-        <h1 className="text-2xl font-bold">{stock.name}</h1>
-        <p>
-          <span className="text-textSecondary">Quantity:</span> {stock.quantity}
-        </p>
-        <p>
-          <span className="text-textSecondary">Unit:</span> {stock.unit}
-        </p>
-        <p>
-          <span className="text-textSecondary">Status:</span>{" "}
-          {stock.quantity > 0 ? "In Stock" : "Out of Stock"}
-        </p>
-        <p className="text-sm text-muted">
-          Updated: {new Date(stock.updatedAt).toLocaleString()}
-        </p>
+        <div className="space-y-2 text-gray-700">
+          <p>
+            <span className="font-semibold">Quantity:</span> {stock.quantity}
+          </p>
+          <p>
+            <span className="font-semibold">Category:</span>{" "}
+            {stock.category || "Uncategorized"}
+          </p>
+          <p>
+            <span className="font-semibold">Status:</span> {stock.status}
+          </p>
+          <p>
+            <span className="font-semibold">Last Updated:</span>{" "}
+            {new Date(stock.updatedAt).toLocaleDateString()}
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,57 +1,52 @@
-import { prisma } from "@/lib/prisma";
+// app/admin/invoice/[id]/page.tsx
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-export default async function InvoiceDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function InvoiceDetailPage({ params }: Props) {
   const invoice = await prisma.invoice.findUnique({
-    where: { id: params.id },
+    where: {
+      id: params.id,
+    },
     include: {
-      user: true,
-      job: true,
+      client: true, // assuming relation: invoice belongs to a user/client
     },
   });
 
-  if (!invoice) return notFound();
+  if (!invoice) {
+    notFound();
+  }
 
   return (
-    <div className="space-y-6">
-      <Link
-        href="/admin/invoices"
-        className="text-sm text-blue-400 hover:underline"
-      >
-        ← Back to invoices
-      </Link>
-
-      <div className="border border-border rounded-xl p-6 bg-surface space-y-4">
-        <h1 className="text-2xl font-bold">Invoice</h1>
-        <p>
-          <span className="text-textSecondary">Client:</span>{" "}
-          {invoice.user.name}
-        </p>
-        <p>
-          <span className="text-textSecondary">Email:</span>{" "}
-          {invoice.user.email}
-        </p>
-        {invoice.job && (
+    <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">Invoice #{invoice.id}</h1>
+        <div className="space-y-2 text-gray-700">
           <p>
-            <span className="text-textSecondary">Job:</span> {invoice.job.title}
+            <span className="font-semibold">Client:</span>{" "}
+            {invoice.client?.name || "Unknown"}
           </p>
-        )}
-        <p>
-          <span className="text-textSecondary">Amount:</span> GH₵{" "}
-          {invoice.amount.toFixed(2)}
-        </p>
-        <p>
-          <span className="text-textSecondary">Status:</span>{" "}
-          <span className="capitalize">{invoice.status.toLowerCase()}</span>
-        </p>
-        <p className="text-sm text-muted">
-          Issued on: {new Date(invoice.createdAt).toLocaleDateString()}
-        </p>
+          <p>
+            <span className="font-semibold">Amount:</span> $
+            {invoice.amount.toFixed(2)}
+          </p>
+          <p>
+            <span className="font-semibold">Status:</span> {invoice.status}
+          </p>
+          <p>
+            <span className="font-semibold">Issued:</span>{" "}
+            {new Date(invoice.createdAt).toLocaleDateString()}
+          </p>
+          <p>
+            <span className="font-semibold">Due:</span>{" "}
+            {new Date(invoice.dueDate).toLocaleDateString()}
+          </p>
+        </div>
       </div>
     </div>
   );

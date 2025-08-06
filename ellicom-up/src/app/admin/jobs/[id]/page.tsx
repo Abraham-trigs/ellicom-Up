@@ -1,7 +1,6 @@
-import { prisma } from "@/lib/prisma";
+// app/admin/job/[id]/page.tsx
 import { notFound } from "next/navigation";
-import { JobStatus } from "@prisma/client";
-import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: {
@@ -11,60 +10,45 @@ type Props = {
 
 export default async function JobDetailPage({ params }: Props) {
   const job = await prisma.job.findUnique({
-    where: { id: params.id },
+    where: {
+      id: params.id,
+    },
     include: {
-      user: true,
-      client: true,
+      createdBy: true,
+      handledBy: true,
     },
   });
 
-  if (!job) return notFound();
-
-  const submittedBy = job.user
-    ? `${job.user.name} (${job.user.email})`
-    : job.client
-    ? `${job.client.name} (${job.client.email})`
-    : "Unknown";
+  if (!job) {
+    notFound();
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{job.title}</h1>
-        <Link
-          href="/admin/jobs"
-          className="inline-block bg-sea text-white px-4 py-2 rounded hover:bg-darkSea transition"
-        >
-          ← Back to All Jobs
-        </Link>
-      </div>
+    <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">{job.title}</h1>
 
-      <div className="border border-border rounded-xl p-6 bg-surface text-white space-y-3">
-        <p>
-          <strong>Type:</strong> {job.type}
-        </p>
-        <p>
-          <strong>Status:</strong>{" "}
-          <span
-            className={`px-2 py-1 rounded ${
-              job.status === JobStatus.COMPLETED
-                ? "bg-green-600"
-                : job.status === JobStatus.IN_PROGRESS
-                ? "bg-yellow-600"
-                : job.status === JobStatus.CANCELLED
-                ? "bg-red-600"
-                : "bg-blue-600"
-            }`}
-          >
-            {job.status}
-          </span>
-        </p>
-        <p>
-          <strong>Submitted by:</strong> {submittedBy}
-        </p>
-        <p>
-          <strong>Created:</strong>{" "}
-          {new Date(job.createdAt).toLocaleString("en-GB")}
-        </p>
+        <div className="space-y-2 text-gray-700">
+          <p>
+            <span className="font-semibold">Status:</span> {job.status}
+          </p>
+          <p>
+            <span className="font-semibold">Details:</span>{" "}
+            {job.details || "No details provided."}
+          </p>
+          <p>
+            <span className="font-semibold">Created By:</span>{" "}
+            {job.createdBy?.name || "Unknown"} ({job.createdBy?.role})
+          </p>
+          <p>
+            <span className="font-semibold">Handled By:</span>{" "}
+            {job.handledBy?.name || "Not assigned"}
+          </p>
+          <p>
+            <span className="font-semibold">Created At:</span>{" "}
+            {new Date(job.createdAt).toLocaleDateString()}
+          </p>
+        </div>
       </div>
     </div>
   );
