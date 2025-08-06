@@ -1,24 +1,15 @@
 // app/admin/client/[id]/page.tsx
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 
-type Props = {
-  params: {
-    id: string;
+export default function ClientDetailPage() {
+  // Dummy static UI — replace with real client data once ready
+  const client = {
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "+1 555-1234",
+    totalRevenue: 12999.99,
+    totalJobs: 7,
+    createdAt: new Date().toLocaleDateString(),
   };
-};
-
-export default async function ClientDetailPage({ params }: Props) {
-  const client = await prisma.user.findUnique({
-    where: {
-      id: params.id,
-      role: "CLIENT",
-    },
-  });
-
-  if (!client) {
-    notFound();
-  }
 
   return (
     <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
@@ -29,8 +20,7 @@ export default async function ClientDetailPage({ params }: Props) {
             <span className="font-semibold">Email:</span> {client.email}
           </p>
           <p>
-            <span className="font-semibold">Phone:</span>{" "}
-            {client.phone || "N/A"}
+            <span className="font-semibold">Phone:</span> {client.phone}
           </p>
           <p>
             <span className="font-semibold">Total Revenue:</span> $
@@ -41,8 +31,7 @@ export default async function ClientDetailPage({ params }: Props) {
             {client.totalJobs}
           </p>
           <p>
-            <span className="font-semibold">Joined:</span>{" "}
-            {new Date(client.createdAt).toLocaleDateString()}
+            <span className="font-semibold">Joined:</span> {client.createdAt}
           </p>
         </div>
       </div>

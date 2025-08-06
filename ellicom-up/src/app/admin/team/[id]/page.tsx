@@ -1,21 +1,16 @@
 // app/admin/team/[id]/page.tsx
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 
-type Props = {
-  params: {
-    id: string;
+export default function TeamMemberPage() {
+  // Static dummy team member data
+  const user = {
+    name: "Angela Mensah",
+    email: "angela@company.com",
+    phone: "+233 24 123 4567",
+    role: "STAFF",
+    totalJobs: 15,
+    totalRevenue: 4500.75,
+    createdAt: new Date().toLocaleDateString(),
   };
-};
-
-export default async function TeamMemberPage({ params }: Props) {
-  const user = await prisma.user.findUnique({
-    where: { id: params.id },
-  });
-
-  if (!user || !["ADMIN", "SECRETARY", "STAFF"].includes(user.role)) {
-    notFound();
-  }
 
   return (
     <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
@@ -27,7 +22,7 @@ export default async function TeamMemberPage({ params }: Props) {
             <span className="font-semibold">Email:</span> {user.email}
           </p>
           <p>
-            <span className="font-semibold">Phone:</span> {user.phone || "N/A"}
+            <span className="font-semibold">Phone:</span> {user.phone}
           </p>
           <p>
             <span className="font-semibold">Role:</span> {user.role}
@@ -40,8 +35,7 @@ export default async function TeamMemberPage({ params }: Props) {
             {user.totalRevenue.toFixed(2)}
           </p>
           <p>
-            <span className="font-semibold">Joined:</span>{" "}
-            {new Date(user.createdAt).toLocaleDateString()}
+            <span className="font-semibold">Joined:</span> {user.createdAt}
           </p>
         </div>
       </div>

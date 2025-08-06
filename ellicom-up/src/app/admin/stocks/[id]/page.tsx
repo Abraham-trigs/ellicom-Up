@@ -1,23 +1,14 @@
 // app/admin/stock/[id]/page.tsx
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 
-type Props = {
-  params: {
-    id: string;
+export default function StockDetailPage() {
+  // Static dummy stock data
+  const stock = {
+    name: "A4 Paper Pack",
+    quantity: 42,
+    category: "Office Supplies",
+    status: "Available",
+    updatedAt: new Date().toLocaleDateString(),
   };
-};
-
-export default async function StockDetailPage({ params }: Props) {
-  const stock = await prisma.stock.findUnique({
-    where: {
-      id: params.id,
-    },
-  });
-
-  if (!stock) {
-    notFound();
-  }
 
   return (
     <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
@@ -29,15 +20,14 @@ export default async function StockDetailPage({ params }: Props) {
             <span className="font-semibold">Quantity:</span> {stock.quantity}
           </p>
           <p>
-            <span className="font-semibold">Category:</span>{" "}
-            {stock.category || "Uncategorized"}
+            <span className="font-semibold">Category:</span> {stock.category}
           </p>
           <p>
             <span className="font-semibold">Status:</span> {stock.status}
           </p>
           <p>
             <span className="font-semibold">Last Updated:</span>{" "}
-            {new Date(stock.updatedAt).toLocaleDateString()}
+            {stock.updatedAt}
           </p>
         </div>
       </div>
