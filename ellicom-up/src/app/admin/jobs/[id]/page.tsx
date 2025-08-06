@@ -1,27 +1,20 @@
 // app/admin/job/[id]/page.tsx
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 
-type Props = {
-  params: {
-    id: string;
+export default function JobDetailPage() {
+  // Dummy static job data — replace with real fetch later
+  const job = {
+    title: "Fix Plumbing at Office",
+    status: "In Progress",
+    details: "Client reported water leakage in the main bathroom.",
+    createdBy: {
+      name: "Sarah Admin",
+      role: "ADMIN",
+    },
+    handledBy: {
+      name: "Jake Staff",
+    },
+    createdAt: new Date().toLocaleDateString(),
   };
-};
-
-export default async function JobDetailPage({ params }: Props) {
-  const job = await prisma.job.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      createdBy: true,
-      handledBy: true,
-    },
-  });
-
-  if (!job) {
-    notFound();
-  }
 
   return (
     <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
@@ -38,15 +31,14 @@ export default async function JobDetailPage({ params }: Props) {
           </p>
           <p>
             <span className="font-semibold">Created By:</span>{" "}
-            {job.createdBy?.name || "Unknown"} ({job.createdBy?.role})
+            {job.createdBy.name} ({job.createdBy.role})
           </p>
           <p>
             <span className="font-semibold">Handled By:</span>{" "}
             {job.handledBy?.name || "Not assigned"}
           </p>
           <p>
-            <span className="font-semibold">Created At:</span>{" "}
-            {new Date(job.createdAt).toLocaleDateString()}
+            <span className="font-semibold">Created At:</span> {job.createdAt}
           </p>
         </div>
       </div>
