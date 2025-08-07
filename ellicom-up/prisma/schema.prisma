@@ -52,3 +52,12 @@ model Job {
   handledById  String?
   handledBy    User?      @relation("JobsHandled", fields: [handledById], references: [id])
 }
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
