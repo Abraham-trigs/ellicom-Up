@@ -38,3 +38,38 @@ export async function POST(req: NextRequest) {
     return new NextResponse('Failed to create client', { status: 500 })
   }
 }
+
+// PATCH: Update a client
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id, name, email, phone } = body;
+
+    const updatedClient = await prisma.user.update({
+      where: { id },
+      data: { name, email, phone },
+    });
+
+    return NextResponse.json(updatedClient);
+  } catch (error) {
+    console.error('[PATCH /api/clients]', error);
+    return new NextResponse('Failed to update client', { status: 500 });
+  }
+}
+
+// DELETE: Remove a client
+export async function DELETE(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id } = body;
+
+    await prisma.user.delete({
+      where: { id },
+    });
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error('[DELETE /api/clients]', error);
+    return new NextResponse('Failed to delete client', { status: 500 });
+  }
+}

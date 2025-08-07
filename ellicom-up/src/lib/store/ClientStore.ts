@@ -67,7 +67,9 @@ export const useClientStore = create<ClientStore>((set) => ({
 
   deleteClient: async (id) => {
     try {
-      const res = await fetch(`/api/clients/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/clients/${id}`, {
+        method: 'DELETE',
+      });
       if (!res.ok) throw new Error('Failed to delete client');
       set((state) => ({
         clients: state.clients.filter((c) => c.id !== id),
