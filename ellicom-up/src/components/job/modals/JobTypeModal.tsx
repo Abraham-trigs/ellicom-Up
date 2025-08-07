@@ -10,11 +10,8 @@ type JobType =
   | "Scanning"
   | "Binding"
   | "Lamination"
-  | "Flyer Design"
-  | "Business Cards"
-  | "Thesis Print"
-  | "Banner"
-  | "CV Print";
+  | "Typing"
+  | "Designing";
 
 interface JobTypeModalProps {
   open: boolean;
@@ -28,11 +25,8 @@ const jobTypes: JobType[] = [
   "Scanning",
   "Binding",
   "Lamination",
-  "Flyer Design",
-  "Business Cards",
-  "Thesis Print",
-  "Banner",
-  "CV Print",
+  "Typing",
+  "Designing",
 ];
 
 const backdropStyle = `

@@ -4,7 +4,7 @@ import React from "react";
 
 const PapperPrintingRecorder = () => {
   return (
-    <div className="mb-2 w-contain ml-1 mr-1 w-70 h-contain bg-darkSea border-2 border-sea rounded-2xl">
+    <div className="mb-2 w-contain ml-1 mr-1 w-contain h-contain bg-darkSea border-2 border-sea rounded-2xl">
       {/* Job Type Header */}
       <div className="text-center text-coHead font-bold">PAPER PRINTING</div>
 

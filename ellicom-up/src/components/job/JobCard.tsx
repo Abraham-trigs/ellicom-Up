@@ -43,15 +43,16 @@ export default function JobCard() {
         </button>
 
         {/* Card Body */}
-        <div className="w-full sm:w-80 md:w-96 border-2 border-sea bg-darkSea rounded-3xl mt-2 p-4 flex flex-col justify-between gap-4">
-          {/* Top Row: PaperSize + JobType + Quantity */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* Card Body */}
+        <div className="w-full sm:max-w-md md:max-w-lg border-2 border-sea bg-darkSea rounded-3xl mt-2 p-4 flex flex-col justify-between gap-4">
+          {/* Top Row: PaperSize + JobType + Quantity + Color + Side + File */}
+          <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:justify-between">
             {/* Paper Size + Job Info */}
-            <div className="flex flex-row justify-between items-center w-full md:w-auto gap-2 bg-high rounded-xl p-2 shadow-md">
+            <div className="flex-1 min-w-[220px] flex flex-row items-center justify-between gap-2 bg-high rounded-xl p-2 shadow-md">
               {/* Paper Size */}
               <div
                 onClick={isJobSelected ? openPaperSizeModal : undefined}
-                className="flex flex-col justify-center items-center w-20 h-20 sm:w-24 sm:h-24 bg-ground rounded-md border shadow cursor-pointer"
+                className="flex flex-col justify-center items-center w-20 h-20 sm:w-24 sm:h-24 bg-ground rounded-md border shadow cursor-pointer shrink-0"
               >
                 <div className="text-center font-semibold text-coHead text-sm border-b-2 border-coHead">
                   Size
@@ -63,7 +64,7 @@ export default function JobCard() {
                 {/* Job Type */}
                 <div
                   onClick={openModal}
-                  className="w-20 h-8 rounded-md bg-ground text-coHead flex justify-center items-center text-sm font-semibold cursor-pointer hover:bg-coHead hover:text-ground transition"
+                  className="w-24 h-8 rounded-md bg-ground text-coHead flex justify-center items-center text-sm font-semibold cursor-pointer hover:bg-coHead hover:text-ground transition"
                 >
                   {isJobSelected ? "Selected" : "Job Type"}
                 </div>
@@ -71,7 +72,7 @@ export default function JobCard() {
                 {/* Quantity */}
                 <div
                   onClick={isJobSelected ? openQuantityModal : undefined}
-                  className="w-20 h-10 rounded-md bg-coHead flex items-center justify-center"
+                  className="w-24 h-10 rounded-md bg-coHead flex items-center justify-center"
                 >
                   <div className="w-10 h-10 flex items-center justify-center bg-ground rounded-md text-coHead text-xs font-bold cursor-pointer">
                     QTY
@@ -81,7 +82,7 @@ export default function JobCard() {
             </div>
 
             {/* Color + Side + File */}
-            <div className="flex flex-col items-center bg-high p-3 rounded-2xl shadow-md w-full md:w-auto">
+            <div className="flex-1 min-w-[220px] flex flex-col items-center bg-high p-3 rounded-2xl shadow-md">
               <div className="flex flex-row gap-2 mb-2">
                 <div
                   onClick={() => setColorType("Color")}

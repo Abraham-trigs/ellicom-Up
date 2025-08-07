@@ -1,62 +1,68 @@
-import { PrismaClient } from '@prisma/client'
-import { faker } from '@faker-js/faker'
+import { PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient()
-
-// Define JobStatus enum manually (safer than runtime import)
-const jobStatuses = ['DRAFT', 'PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] as const
-type JobStatus = (typeof jobStatuses)[number]
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting seed...')
+// Designing (from image)
+await prisma.jobPricing.createMany({
+  data: [
+    { jobType: "Designing", variable: "Logo", unitPrice: 50, modifiers: [] },
+    { jobType: "Designing", variable: "Letterhead", unitPrice: 40, modifiers: [] },
+    { jobType: "Designing", variable: "Call Card", unitPrice: 30, modifiers: [] },
+    { jobType: "Designing", variable: "Flyer", unitPrice: 40, modifiers: [] },
+    { jobType: "Designing", variable: "Poster", unitPrice: 45, modifiers: [] },
+    { jobType: "Designing", variable: "Brochure", unitPrice: 60, modifiers: [] },
+    { jobType: "Designing", variable: "Receipt", unitPrice: 25, modifiers: [] },
+    { jobType: "Designing", variable: "Invoice", unitPrice: 25, modifiers: [] },
+    { jobType: "Designing", variable: "Form", unitPrice: 20, modifiers: [] },
+    { jobType: "Designing", variable: "Sign Board", unitPrice: 80, modifiers: [] },
+    { jobType: "Designing", variable: "Picture Editing", unitPrice: 25, modifiers: [] },
+  ],
+});
 
-  // Create 5 users (one for each role)
-  const roles = ['SUPERADMIN', 'ADMIN', 'SECRETARY', 'STAFF', 'CLIENT'] as const
+  // Typing
+  await prisma.jobPricing.createMany({
+    data: [
+      { jobType: "Typing", variable: "A4", unitPrice: 0.5, materialType: "Paper", modifiers: [] },
+      { jobType: "Typing", variable: "A3", unitPrice: 1, materialType: "Paper", modifiers: [] },
+      { jobType: "Typing", variable: "Thesis", unitPrice: 3, materialType: "Paper", modifiers: [] },
+    ],
+  });
 
-  const users = await Promise.all(
-    roles.map(role =>
-      prisma.user.create({
-        data: {
-          name: faker.person.fullName(),
-          email: faker.internet.email(),
-          phone: faker.phone.number(),
-          role,
-          password: faker.internet.password(),
-        },
-      })
-    )
-  )
+  // Scanning
+  await prisma.jobPricing.createMany({
+    data: [
+      { jobType: "Scanning", variable: "Single Page", unitPrice: 1, materialType: "Document", modifiers: [] },
+      { jobType: "Scanning", variable: "Batch", unitPrice: 0.8, materialType: "Document", modifiers: [] },
+    ],
+  });
 
-  console.log(`✅ Created ${users.length} users`)
+  // Lamination
+  await prisma.jobPricing.createMany({
+    data: [
+      { jobType: "Lamination", variable: "A4", unitPrice: 2, materialType: "Lamination Sheet", modifiers: [] },
+      { jobType: "Lamination", variable: "A3", unitPrice: 3.5, materialType: "Lamination Sheet", modifiers: [] },
+      { jobType: "Lamination", variable: "ID Card", unitPrice: 1.5, materialType: "Lamination Sheet", modifiers: [] },
+    ],
+  });
 
-  // Create 10 jobs
-  const jobs = await Promise.all(
-    Array.from({ length: 10 }).map(() => {
-      const creator = faker.helpers.arrayElement(users)
-      const maybeHandler = faker.helpers.maybe(() => faker.helpers.arrayElement(users), { probability: 0.7 })
-
-      return prisma.job.create({
-        data: {
-          title: faker.word.words({ count: { min: 2, max: 5 } }),
-          details: faker.lorem.paragraph(),
-          type: faker.helpers.arrayElement(['Bug', 'Feature', 'Support']),
-          status: faker.helpers.arrayElement(jobStatuses),
-          createdBy: { connect: { id: creator.id } },
-          ...(maybeHandler ? { handledBy: { connect: { id: maybeHandler.id } } } : {}),
-        },
-      })
-    })
-  )
-
-  console.log(`✅ Created ${jobs.length} jobs`)
+  // Large Format
+  await prisma.jobPricing.createMany({
+    data: [
+      { jobType: "Large Format", variable: "Banner", unitPrice: 12, materialType: "Flex", modifiers: [] },
+      { jobType: "Large Format", variable: "Vinyl", unitPrice: 15, materialType: "Vinyl", modifiers: [] },
+      { jobType: "Large Format", variable: "Canvas", unitPrice: 20, materialType: "Canvas", modifiers: [] },
+    ],
+  });
 }
 
 main()
-  .catch((e) => {
-    console.error('❌ Seeding failed:', e)
-    process.exit(1)
+  .then(async () => {
+    await prisma.$disconnect();
+    console.log("🌱 Seeding complete!");
   })
-  .finally(async () => {
-    await prisma.$disconnect()
-    console.log('🌱 Seed complete')
-  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

@@ -61,3 +61,16 @@ model Client {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model JobPricing {
+  id           String   @id @default(cuid())
+  jobType      String   // e.g., "Designing"
+  materialType String?  // Nullable because "Designing" has none
+  variable     String   // e.g., "Logo", "Flyer"
+  unitPrice    Float
+  modifiers    String[] // Empty for now, future-proofed
+  notes        String?  // Manual notes
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
