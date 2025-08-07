@@ -13,6 +13,8 @@ import {
   X,
   Boxes,
   UserCog,
+  PlusCircle,
+  Tag,
 } from "lucide-react";
 
 const navItems = [
@@ -22,6 +24,8 @@ const navItems = [
   { label: "Invoices", icon: FileText, href: "/admin/invoices" },
   { label: "Stocks", icon: Boxes, href: "/admin/stocks" },
   { label: "Team", icon: UserCog, href: "/admin/team" },
+  { label: "Pricing", icon: Tag, href: "/admin/pricing" },
+  { label: "Add Job", icon: PlusCircle, href: "/admin/addJob" },
   { label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
