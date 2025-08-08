@@ -130,7 +130,7 @@ export default function PricingPage() {
             <div>
               <Label>Job Type</Label>
               <Input
-                className="bg-coHead text-coHead
+                className="bg-coHead text-ground font-bold
                            dark:bg-background dark:text-textPrimary dark:border-border"
                 value={formData.jobType}
                 onChange={(e) =>
@@ -143,7 +143,7 @@ export default function PricingPage() {
             <div>
               <Label>Variable</Label>
               <Input
-                className="bg-coHead text-coHead
+                className="bg-coHead text-ground font-bold
                            dark:bg-background dark:text-textPrimary dark:border-border"
                 value={formData.variable}
                 onChange={(e) =>
@@ -156,7 +156,7 @@ export default function PricingPage() {
             <div>
               <Label>Material Type (optional)</Label>
               <Input
-                className="bg-coHead text-coHead
+                className="bg-coHead text-ground font-bold
                            dark:bg-background dark:text-textPrimary dark:border-border"
                 value={formData.materialType || ""}
                 onChange={(e) =>
@@ -169,7 +169,7 @@ export default function PricingPage() {
             <div>
               <Label>Unit Price</Label>
               <Input
-                className="bg-coHead text-coHead
+                className="bg-coHead text-ground font-bold
                            dark:bg-background dark:text-textPrimary dark:border-border"
                 type="number"
                 value={formData.unitPrice}
@@ -186,7 +186,7 @@ export default function PricingPage() {
             <div className="md:col-span-2">
               <Label>Modifiers (comma separated)</Label>
               <Input
-                className="bg-coHead text-coHead
+                className="bg-coHead text-ground font-bold
                            dark:bg-background dark:text-textPrimary dark:border-border"
                 value={formData.modifiers.join(", ")}
                 onChange={(e) =>
@@ -202,7 +202,7 @@ export default function PricingPage() {
             <div className="md:col-span-2">
               <Label>Notes</Label>
               <Textarea
-                className="bg-coHead text-coHead border border-none
+                className="bg-coHead text-ground font-bold border border-none
                            dark:bg-background dark:text-textPrimary dark:border-border"
                 value={formData.notes || ""}
                 onChange={(e) =>
@@ -249,7 +249,7 @@ export default function PricingPage() {
                    text-power dark:bg-surface dark:text-textPrimary"
       >
         <table className="min-w-full table-auto border-collapse text-sm text-left">
-          <thead className="bg-coHead text-inactive dark:bg-surface dark:text-textSecondary">
+          <thead className="bg-coHead text-ground dark:bg-surface dark:text-textSecondary">
             <tr>
               {[
                 "Job Type",
@@ -304,6 +304,8 @@ export default function PricingPage() {
                       size="sm"
                       variant="destructive"
                       onClick={() => handleDelete(item.id)}
+                      className="bg-red-600 text-white hover:bg-red-700
+                                 dark:bg-red-800 dark:hover:bg-red-900"
                     >
                       Delete
                     </Button>

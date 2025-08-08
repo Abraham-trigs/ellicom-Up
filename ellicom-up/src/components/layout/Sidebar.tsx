@@ -56,8 +56,14 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ===== Hamburger toggle + dropdown container only on mobile ===== */}
-      <div className="md:hidden px-4 py-2 flex flex-col border-b border-border bg-surface text-textPrimary relative">
+      {/* Mobile hamburger toggle + dropdown */}
+      <div
+        className="
+          md:hidden px-4 py-2 flex flex-col 
+          border-b border-border bg-container dark:bg-surface 
+          text-head dark:text-textPrimary relative
+        "
+      >
         <div className="flex items-center justify-between">
           <span className="font-medium">Menu</span>
           <button onClick={() => setOpen((prev) => !prev)} className="ml-auto">
@@ -65,7 +71,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Dropdown below hamburger, part of the flow, right-aligned with 70% width */}
         <AnimatePresence>
           {open && (
             <motion.nav
@@ -75,7 +80,13 @@ export default function Sidebar() {
               exit={{ opacity: 0, height: 0 }}
               transition={{ type: "tween", duration: 0.3 }}
               ref={dropdownRef}
-              className="w-[70%] max-h-[80vh] overflow-y-auto mt-2 ml-auto bg-surface border border-border rounded-xl shadow-xl text-textPrimary"
+              className="
+                w-[70%] max-h-[80vh] overflow-y-auto mt-2 ml-auto
+                bg-container dark:bg-surface
+                border border-border
+                rounded-xl shadow-xl
+                text-head dark:text-textPrimary
+              "
             >
               {navItems.map(({ label, icon: Icon, href }) => {
                 const isActive = pathname === href;
@@ -84,11 +95,14 @@ export default function Sidebar() {
                     key={label}
                     href={href}
                     onClick={() => setOpen(false)}
-                    className={`flex items-center gap-2 p-4 transition-colors ${
-                      isActive
-                        ? "bg-border text-white"
-                        : "hover:bg-border hover:text-white"
-                    }`}
+                    className={`
+                      flex items-center gap-2 p-4 transition-colors
+                      ${
+                        isActive
+                          ? "bg-ground text-head dark:text-head"
+                          : "hover:bg-hover hover:text-head dark:hover:text-head"
+                      }
+                    `}
                   >
                     <Icon size={18} />
                     <span className="text-sm">{label}</span>
@@ -106,8 +120,16 @@ export default function Sidebar() {
         </AnimatePresence>
       </div>
 
-      {/* ===== Desktop sidebar (only visible on md and above) ===== */}
-      <aside className="hidden md:block w-60 bg-surface text-textPrimary border-r border-border min-h-screen">
+      {/* Desktop sidebar */}
+      <aside
+        className="
+          hidden md:block w-60 
+          bg-container dark:bg-surface
+          text-head dark:text-textPrimary
+          border-r border-border 
+          min-h-screen
+        "
+      >
         <nav className="flex flex-col">
           {navItems.map(({ label, icon: Icon, href }) => {
             const isActive = pathname === href;
@@ -115,11 +137,14 @@ export default function Sidebar() {
               <a
                 key={label}
                 href={href}
-                className={`flex items-center gap-2 p-4 transition-colors ${
-                  isActive
-                    ? "bg-border text-white"
-                    : "hover:bg-border hover:text-white"
-                }`}
+                className={`
+                  flex items-center gap-2 p-4 transition-colors
+                  ${
+                    isActive
+                      ? "bg-ground text-head dark:text-head"
+                      : "hover:bg-hover hover:text-head dark:hover:text-head"
+                  }
+                `}
               >
                 <Icon size={18} />
                 <span className="text-sm">{label}</span>
