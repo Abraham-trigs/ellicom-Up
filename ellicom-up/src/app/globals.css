@@ -1,73 +1,16 @@
+/* globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ================================
-   LIGHT MODE (Brand Palette)
-   ================================ */
-:root {
-  --sea: #1bd2eb;
-  --gold: #f8e539;
-  --neon-sea: #1bd2eb;
-  --high: #ffb300;
-  --high-gold: #fffb72;
-  --ground: #000321;
-  --container: #010210;
-  --inactive: #b6ae46;
-  --head: #000000;
-  --co-head: #333333;
-  --dark-sea: #04132a;
-  --power: #000000;
-}
-
-/* ================================
-   DARK MODE
-   ================================ */
-.dark {
-  --background: #1b1b1c;
-  --surface: #252526;
-  --border: #2e2e30;
-  --border-alt: #2a2a2c;
-  --text-primary: #e5e5e5;
-  --text-secondary: #a1a1a3;
-  --text-muted: #666668;
-
-  --sea: #1bd2eb;
-  --gold: #f8e539;
-  --neon-sea: #1bd2eb;
-  --high: #ffb300;
-  --high-gold: #fffb72;
-  --ground: #000321;
-  --container: #010210;
-  --inactive: #b6ae46;
-  --head: #ffffff;
-  --co-head: #e0e0e0;
-  --dark-sea: #04132a;
-  --power: #000000;
-}
-
-/* ================================
-   BASE STYLES
-   ================================ */
+/* Default light mode body bg */
 body {
-  background-color: var(--background, #000321); /* fallback for light mode */
-  color: var(--text-primary, #fff);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: #ffffff; /* ground color */
+  transition: background-color 0.3s ease;
 }
 
-/* ================================
-   UTILITY CLASSES (Optional)
-   ================================ */
-/* .bg-background { background-color: var(--background, #ffffff); }
-.bg-surface { background-color: var(--surface, #ffffff); }
-.border-border { border-color: var(--border, transparent); }
-.border-borderAlt { border-color: var(--border-alt, transparent); }
-.text-textPrimary { color: var(--text-primary, #000000); }
-.text-textSecondary { color: var(--text-secondary, #333333); }
-.text-textMuted { color: var(--text-muted, #777777); } */
-
-/* .text-sea { color: var(--sea); }
-.bg-sea { background-color: var(--sea); }
-
-.text-gold { color: var(--gold); }
-.bg-gold { background-color: var(--gold); } */
+/* Dark mode overrides */
+.dark body {
+  background-color: #1b1b1c; /* your dark background */
+}

@@ -1,8 +1,6 @@
 // app/layout.tsx
-"use client";
-
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
+import ThemeProviderWrapper from "../components/ThemeProviderWrapper";
 
 export default function RootLayout({
   children,
@@ -12,9 +10,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
-        </ThemeProvider>
+        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
       </body>
     </html>
   );
