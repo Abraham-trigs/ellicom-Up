@@ -51,23 +51,23 @@
    ================================ */
 body {
   background-color: var(--background, #000321); /* fallback for light mode */
-  color: var(--text-primary, #000000);
+  color: var(--text-primary, #fff);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ================================
    UTILITY CLASSES (Optional)
    ================================ */
-.bg-background { background-color: var(--background, #ffffff); }
+/* .bg-background { background-color: var(--background, #ffffff); }
 .bg-surface { background-color: var(--surface, #ffffff); }
 .border-border { border-color: var(--border, transparent); }
 .border-borderAlt { border-color: var(--border-alt, transparent); }
 .text-textPrimary { color: var(--text-primary, #000000); }
 .text-textSecondary { color: var(--text-secondary, #333333); }
-.text-textMuted { color: var(--text-muted, #777777); }
+.text-textMuted { color: var(--text-muted, #777777); } */
 
-.text-sea { color: var(--sea); }
+/* .text-sea { color: var(--sea); }
 .bg-sea { background-color: var(--sea); }
 
 .text-gold { color: var(--gold); }
-.bg-gold { background-color: var(--gold); }
+.bg-gold { background-color: var(--gold); } */
