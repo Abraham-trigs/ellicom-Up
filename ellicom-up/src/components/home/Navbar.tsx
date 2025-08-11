@@ -4,11 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, easeIn, easeOut } from "framer-motion";
 import clsx from "clsx";
 import AuthButton from "../AuthButton";
-
-const easeCurve = [0.42, 0, 0.58, 1]; // cubic-bezier easing for smooth transitions
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -40,14 +38,14 @@ export default function Navbar() {
       transition: {
         when: "beforeChildren",
         staggerChildren: 0.08,
-        ease: "easeOut", // <-- fixed here
+        ease: easeOut,
         duration: 0.25,
       },
     },
     exit: {
       height: 0,
       opacity: 0,
-      transition: { when: "afterChildren", duration: 0.2, ease: "easeIn" }, // <-- fixed here
+      transition: { when: "afterChildren", duration: 0.2, ease: easeIn },
     },
   };
 
