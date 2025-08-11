@@ -1,12 +1,12 @@
 import { create } from "zustand";
 
-type User = {
+export type User = {
   id: string;
   name: string;
   email?: string;
 };
 
-type Job = {
+export type Job = {
   id: string;
   title: string;
   details?: string;
@@ -18,12 +18,12 @@ type Job = {
   updatedAt?: string;
 };
 
-type JobWithUsers = Job & {
+export type JobWithUsers = Job & {
   createdBy?: User | null;
   handledBy?: User | null;
 };
 
-type JobStore = {
+export type JobStore = {
   jobs: JobWithUsers[];
   fetchJobs: () => Promise<void>;
   createJob: (job: Omit<Job, "id">) => Promise<void>;
