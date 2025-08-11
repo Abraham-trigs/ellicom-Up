@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from "react";
 
 const images = [
@@ -12,10 +14,10 @@ const images = [
 
 export default function CenteredPeekSlider() {
   const [topIndex, setTopIndex] = useState(0);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const touchStartX = useRef(null);
-  const touchEndX = useRef(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,7 +26,8 @@ export default function CenteredPeekSlider() {
     return () => clearInterval(interval);
   }, []);
 
-  function handleMouseMove(e) {
+  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
@@ -39,11 +42,11 @@ export default function CenteredPeekSlider() {
     setTilt({ x: 0, y: 0 });
   }
 
-  function handleTouchStart(e) {
+  function handleTouchStart(e: React.TouchEvent<HTMLDivElement>) {
     touchStartX.current = e.touches[0].clientX;
   }
 
-  function handleTouchMove(e) {
+  function handleTouchMove(e: React.TouchEvent<HTMLDivElement>) {
     touchEndX.current = e.touches[0].clientX;
   }
 
@@ -102,7 +105,7 @@ export default function CenteredPeekSlider() {
           const prevIndex = (topIndex - 1 + images.length) % images.length;
           const nextIndex = (topIndex + 1) % images.length;
 
-          let style = {
+          let style: React.CSSProperties = {
             opacity: 0,
             transform: "translateX(0) scale(0.8)",
             zIndex: 0,
