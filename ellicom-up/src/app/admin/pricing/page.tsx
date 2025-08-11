@@ -13,7 +13,7 @@ export default function PricingPage() {
   const {
     jobPricingList,
     fetchJobPricing,
-    createJobPricing,
+    addJobPricing,
     updateJobPricing,
     deleteJobPricing,
   } = useJobPricingStore();
@@ -51,7 +51,7 @@ export default function PricingPage() {
     if (editingId) {
       await updateJobPricing(editingId, formData);
     } else {
-      await createJobPricing(formData);
+      await addJobPricing(formData);
     }
 
     setFormData({
