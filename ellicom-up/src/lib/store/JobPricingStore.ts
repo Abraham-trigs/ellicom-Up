@@ -18,8 +18,8 @@ type JobPricing = {
   unitPrice: number;
   modifiers: string[];
   notes?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;  // <-- Date now, not string
+  updatedAt: Date;  // <-- Date now, not string
 };
 
 type State = {
@@ -27,11 +27,10 @@ type State = {
   isLoading: boolean;
   error: string | null;
 
-  // Computed value
   jobTypes: string[];
 
   fetchJobPricing: () => Promise<void>;
-  createJobPricing: (
+  addJobPricing: (
     data: Omit<JobPricing, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   updateJobPricing: (
@@ -58,7 +57,15 @@ export const useJobPricingStore = create<State>()(
           try {
             const res = await fetch("/api/job-pricing");
             if (!res.ok) throw new Error("Failed to fetch pricing data");
-            const freshData: JobPricing[] = await res.json();
+
+            const freshDataRaw: JobPricing[] = await res.json();
+
+            // Convert string dates to Date objects
+            const freshData = freshDataRaw.map((item) => ({
+              ...item,
+              createdAt: new Date(item.createdAt),
+              updatedAt: new Date(item.updatedAt),
+            }));
 
             const isDifferent =
               JSON.stringify(freshData) !== JSON.stringify(get().jobPricingList);
@@ -86,7 +93,7 @@ export const useJobPricingStore = create<State>()(
             debouncedFetch();
           },
 
-          createJobPricing: async (payload) => {
+          addJobPricing: async (payload) => {
             set({ isLoading: true, error: null });
             try {
               const res = await fetch("/api/job-pricing", {
@@ -95,7 +102,15 @@ export const useJobPricingStore = create<State>()(
                 body: JSON.stringify(payload),
               });
               if (!res.ok) throw new Error("Failed to add pricing");
-              const newEntry = await res.json();
+              const newEntryRaw = await res.json();
+
+              // Convert new entry dates to Date objects
+              const newEntry = {
+                ...newEntryRaw,
+                createdAt: new Date(newEntryRaw.createdAt),
+                updatedAt: new Date(newEntryRaw.updatedAt),
+              };
+
               set((state) => ({
                 jobPricingList: [newEntry, ...state.jobPricingList],
                 isLoading: false,
@@ -114,7 +129,14 @@ export const useJobPricingStore = create<State>()(
                 body: JSON.stringify(payload),
               });
               if (!res.ok) throw new Error("Failed to update pricing");
-              const updated = await res.json();
+              const updatedRaw = await res.json();
+
+              const updated = {
+                ...updatedRaw,
+                createdAt: new Date(updatedRaw.createdAt),
+                updatedAt: new Date(updatedRaw.updatedAt),
+              };
+
               set((state) => ({
                 jobPricingList: state.jobPricingList.map((item) =>
                   item.id === id ? updated : item
@@ -146,7 +168,7 @@ export const useJobPricingStore = create<State>()(
         };
       },
       {
-        name: "jobPricingStore", // localStorage key
+        name: "jobPricingStore",
         partialize: (state) => ({
           jobPricingList: state.jobPricingList,
         }),
