@@ -40,14 +40,14 @@ export default function Navbar() {
       transition: {
         when: "beforeChildren",
         staggerChildren: 0.08,
-        ease: easeCurve,
+        ease: "easeOut", // <-- fixed here
         duration: 0.25,
       },
     },
     exit: {
       height: 0,
       opacity: 0,
-      transition: { when: "afterChildren", duration: 0.2, ease: easeCurve },
+      transition: { when: "afterChildren", duration: 0.2, ease: "easeIn" }, // <-- fixed here
     },
   };
 
