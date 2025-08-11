@@ -1,0 +1,16 @@
+/* globals.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Default light mode body bg */
+body {
+  background-color: #000321; /* ground color */
+  transition: background-color 0.3s ease;
+}
+
+/* Dark mode overrides */
+.dark body {
+  background-color: #1b1b1c; /* your dark background */
+}

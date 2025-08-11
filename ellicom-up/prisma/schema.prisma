@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String?
+  phone       String?
+  role        Role
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdJobs Job[]    @relation("JobsCreated")
+  handledJobs Job[]    @relation("JobsHandled")
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  title       String
+  details     String?
+  type        String
+  status      JobStatus @default(DRAFT)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdById String
+  handledById String?
+  createdBy   User      @relation("JobsCreated", fields: [createdById], references: [id])
+  handledBy   User?     @relation("JobsHandled", fields: [handledById], references: [id])
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JobPricing {
+  id           String   @id @default(cuid())
+  jobType      String
+  materialType String?
+  variable     String
+  unitPrice    Float
+  modifiers    String[]
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  SECRETARY
+  STAFF
+  CLIENT
+}
+
+enum JobStatus {
+  DRAFT
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}

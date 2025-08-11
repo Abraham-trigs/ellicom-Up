@@ -1,0 +1,42 @@
+// export default function BackgroundVideo({ src, poster }) {
+//   return (
+//     <div
+//       className="
+//         fixed
+//         top-0
+//         left-0
+//         w-full
+//         z-0
+//         overflow-hidden
+//         lg:h-[700px]    /* Control height on desktop */
+//         h-auto
+//       "
+//     >
+//       <div
+//         className="
+//           w-full
+//           h-full
+//           flex
+//           items-center
+//           justify-center
+//           overflow-hidden
+//         "
+//       >
+//         <video
+//           autoPlay
+//           muted
+//           loop
+//           playsInline
+//           poster={poster}
+//           src={src}
+//           type="video/mp4"
+//           className="
+//             w-full
+//             h-auto
+//             object-cover
+//           "
+//         />
+//       </div>
+//     </div>
+//   );
+// }

@@ -1,0 +1,416 @@
+Commit: a5445eb21683f6412df96054aa73c140090cb879
+Author: Abraham Bortey Danfa
+Date: 2025-08-11
+
+video file ignore in git.ignore
+
+
+------------------------
+Commit: ce55292c914da0912833dc5db466ec886672ef9f
+Author: Abraham Bortey Danfa
+Date: 2025-08-11
+
+TeamStore renamed
+
+
+------------------------
+Commit: be21121105115d9a31c7e99d9825203c27fc86fc
+Author: Abraham Bortey Danfa
+Date: 2025-08-11
+
+feat(auth): configure Google OAuth with NextAuth & add SessionProvider wrapper
+
+- Added Google OAuth credentials from Google Cloud Console
+- Created .env variables for GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+- Configured NextAuth API route with Google provider and JWT session strategy
+- Updated root layout to wrap the app with SessionProvider for useSession() support
+- Prepared app for dynamic auth-based UI (e.g., swapping login button with user profile info)
+-background video removed to optimize performance and to enable quick push (the video will be added after some develpment)
+
+------------------------
+Commit: 0682b6257c8363691ac00518cef54835f32f05df
+Author: Abraham Bortey Danfa
+Date: 2025-08-11
+
+authButton implemement tohandle User login and session
+
+
+------------------------
+Commit: 2850feb806db6ab0ed83ff5c6a0d2941d098d719
+Author: Abraham Bortey Danfa
+Date: 2025-08-10
+
+Material fetching implemented
+
+
+------------------------
+Commit: 0d38e86faecaf61775a80282a3f37870bbc001bd
+Author: Abraham Bortey Danfa
+Date: 2025-08-10
+
+Jobtype fetched. Locastorage added to PricingStore
+
+
+------------------------
+Commit: 6422c0d79787a59b6a93efd8592c525590580141
+Author: Abraham Bortey Danfa
+Date: 2025-08-09
+
+background video set responsively. slide
+
+
+------------------------
+Commit: ee1fc51e118c3ad3c7e89af78e6d9a7ad2abf846
+Author: Abraham Bortey Danfa
+Date: 2025-08-09
+
+horizontal layout implmented in deskoptop mode
+
+
+------------------------
+Commit: 86ca988c2d1da7f863c6d40bdf31f50758a7e621
+Author: Abraham Bortey Danfa
+Date: 2025-08-09
+
+images transitions added with sample images
+
+
+------------------------
+Commit: 5adbb4c4d8b653a318829a51b48d448e3d7f9747
+Author: Abraham Bortey Danfa
+Date: 2025-08-08
+
+background image implmented with a fall fall back image
+
+
+------------------------
+Commit: b3f42705af2e9c627f8d1bc6fd08f6faa136d365
+Author: Abraham Bortey Danfa
+Date: 2025-08-08
+
+Added responsive banner images to public folder to fix 404 errors and enable proper image loading across devices.
+
+
+------------------------
+Commit: d50de53d74488b9cfddf10f735ebd0a2298b4c74
+Author: Abraham Bortey Danfa
+Date: 2025-08-08
+
+admin respective tabs atyle updated
+
+
+------------------------
+Commit: 7caf830e9c7f0a70d0d18106d33a20c53aa93c70
+Author: Abraham Bortey Danfa
+Date: 2025-08-08
+
+theme defined
+
+
+------------------------
+Commit: 8d72b21d28699e7243dd1b6a3765b7e0cadc59e1
+Author: Abraham Bortey Danfa
+Date: 2025-08-08
+
+redefining my tailwindcss and themes
+
+
+------------------------
+Commit: d05b834490979d7b73b67f657c445e79f5195023
+Author: Abraham Bortey Danfa
+Date: 2025-08-08
+
+WIP before viewing old commit
+
+
+------------------------
+Commit: ff85ae0688686cb07532f6bbed6d5ce8ca12b76f
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+initial commit of JobPricing implemeneted and fetched
+
+
+------------------------
+Commit: c11b1897ddb207d342e2ca30255e9cc7dd7c60a3
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+Job table initail commit with seeded data
+
+
+------------------------
+Commit: fa6fc477c6989563b93c90fd51ca5b0422f5c6ab
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+JobCard Responsivness on desktop,laptop defined
+
+
+------------------------
+Commit: d917a11a40476d606b92e698cd44ef5ea0e0cb32
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+JobCard initial setup
+
+
+------------------------
+Commit: 9dcabb031f3bdff781563baf1031f177bb608863
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+fetched other roles as team
+
+
+------------------------
+Commit: 39e7d1adb63833c3549e0367183713eb210fcad3
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+Client CRUD
+
+
+------------------------
+Commit: fb4bbea0c0f2c1c625989f2b6035b00b45438b5f
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+client fetched as user === client
+
+
+------------------------
+Commit: 0b0e38b7c68a9d295e98f68d1aca8fdb5d74ee78
+Author: Abraham Bortey Danfa
+Date: 2025-08-07
+
+chore: add initial Prisma schema and seed script; remove unused config file
+
+
+------------------------
+Commit: 3cc6b288d80352f0ba97dee5ae4823178bfb3401
+Author: Abraham Bortey Danfa
+Date: 2025-08-06
+
+prisma foldes deleted
+
+
+------------------------
+Commit: 1d1cb876963cc676c6da69425cad3886979dd1fa
+Author: Abraham Bortey Danfa
+Date: 2025-08-06
+
+Replace job detail page dynamic data with static mock data for UI prototyping
+
+
+------------------------
+Commit: da661349725b8b57a0a9be4675c04d08547a41de
+Author: Abraham Bortey Danfa
+Date: 2025-08-06
+
+Replaced all dynamic data fetching with static UI placeholders in admin detail pages for clients, invoices, jobs, stock, team, and settings.
+
+
+------------------------
+Commit: faaf894e1770e8b30cf0806529481c6d165a3911
+Author: Abraham Bortey Danfa
+Date: 2025-08-06
+
+all link function and logic per database rese
+
+
+------------------------
+Commit: 2c4134719cf97a176613f0efa5e0d800bf1cd4d3
+Author: Abraham Bortey Danfa
+Date: 2025-08-05
+
+teammembers fetched
+
+
+------------------------
+Commit: 0b5b124b144480d0bc1098a5470e27ae01900b17
+Author: Abraham Bortey Danfa
+Date: 2025-08-05
+
+feat(seed): Seed roles, users, clients, and Ellicom-style jobs
+
+- Added initial roles: SuperAdmin, Admin, Secretary, and Staff
+- Created two users: Abraham Ellicom (SuperAdmin) and Sandra Mensah (Staff)
+- Seeded one external client: Kwame Nyarko of Kwame Ventures
+- Seeded three realistic jobs with actual Ellicom job types:
+  - Photocopy 200 pages (completed by Sandra)
+  - Design + Print Flyers (in progress for Kwame)
+  - Large Format Poster (pending for Kwame)
+- Applied enum usage for JobType and JobStatus
+- Ensured relations are correctly mapped via userId and clientId
+- Script uses  with ts-node as provider
+
+------------------------
+Commit: b1212bc7077c3caa3123b14c049c31acd92889af
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+Start point to fetch data
+
+
+------------------------
+Commit: d9396b3c4e08a32d2278a71efadbade03389a463
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+Add invoices list and detail pages
+
+
+------------------------
+Commit: 55bf36d952ca3317115a85767410fff39db0836a
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+Add client list and detail pages with job and invoice previews
+
+
+------------------------
+Commit: 8b3d9fb98b74b436c55e08d26839d7a293cb7833
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+feat(admin/clients): list all clients and view details with submitted jobs
+
+
+------------------------
+Commit: 2634de3050dc564d339fbc0a7c38f7a0399dcdca
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+feat(admin): implement job fetching and listing in Admin dashboard
+
+- Added Prisma query to fetch all jobs with associated user data
+- Displayed job title, type, submitter name, and status
+- Included status-based color badges
+- Prepared for dynamic job detail navigation via job ID links
+
+------------------------
+Commit: 22d52b1dfdf3f70478163208d5cbe236c5b36846
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+data seeded and this marks the point of fecthing mocked data to test db
+
+
+------------------------
+Commit: 26fe8a357aa6f7b790a53148d6ba8b57c4f85f58
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+added new models to the Neon DB
+
+
+------------------------
+Commit: baccb6960d7ce2c59dd39714de5a2394ab0f127f
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+page.tsx (homepage) text edited )
+
+
+------------------------
+Commit: fdb1891aa46e6f44983ac84894c077f52d328512
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+- Replaced smart quote with &apos; to comply with JSX formatting rules - Unblocked Vercel build caused by unescaped character in <p> tag  enter the commit message for your changes. Lines starting
+
+
+------------------------
+Commit: 413f7e285ff3dfa7afb303152573c27ee8df68ec
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+directyory renamed
+
+
+------------------------
+Commit: 624149a95e2794a4c394c2e8891ff7156f5d2646
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+aded putes fo the new created files and modified files in admin Sidebar
+
+
+------------------------
+Commit: d05c03aaa0ded17617535874b2fd128182ebe627
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+feat(navigation): add Stock and Staff links to admin sidebar
+
+- Added 'Stock' with Boxes icon pointing to /admin/stock
+- Added 'Staff' with UserCog icon pointing to /admin/staff
+
+------------------------
+Commit: 451a149c174447ef0301018bb71eccca4d577136
+Author: Abraham Bortey Danfa
+Date: 2025-08-04
+
+- Updated LayoutShell to adapt between stacked (mobile) and horizontal (desktop) layouts - Ensured mobile dropdown pushes content down instead of overlaying - Applied flex direction tweaks for better height behavior on smaller screens - Sidebar now collapses on mobile and remains fixed on desktop mit message for your changes. Lines starting
+
+
+------------------------
+Commit: 4b13c7cc66e9ce51f99a16c4b2131264aa3bca68
+Author: Abraham Bortey Danfa
+Date: 2025-08-03
+
+refactor: move sidebar below navbar with responsive layout shell
+
+
+------------------------
+Commit: c720d6f416de5f95699711803c0e6b4a9d6e8df6
+Author: Abraham Bortey Danfa
+Date: 2025-08-03
+
+fix: restructure LayoutShell for proper sidebar and navbar responsiveness
+
+
+------------------------
+Commit: 766409520b94e8e1a89e749adebab842b31c0de7
+Author: Abraham Bortey Danfa
+Date: 2025-08-03
+
+aded routes to admin dashboard navigations
+
+
+------------------------
+Commit: 530a2e5ba4538a6c7cd2b35556a3cd3cb1aebd3f
+Author: Abraham Bortey Danfa
+Date: 2025-08-03
+
+Sidebar developed and its in its initial state
+
+
+------------------------
+Commit: 89104d33d3faaa0b1cc1f4fc5d1797b46f3793ee
+Author: Abraham Bortey Danfa
+Date: 2025-08-03
+
+git commit -m "fix(navbar): constrain logo height and add fallback text for accessibility
+
+- Set max height for logo (h-8 w-auto) to fix oversized navbar
+- Used object-contain to ensure logo scales proportionally
+- Added alt text and fallback span for accessibility and skeleton rendering
+- Navbar now renders consistently across screen sizes and themes
+"
+
+------------------------
+Commit: ae536abf3e53a4d5cb678ef4da11fe22ffe954f9
+Author: Abraham Bortey Danfa
+Date: 2025-08-03
+
+feat(theme): implement theme toggle with brand colors and dark mode palette
+
+- Integrated working ThemeToggle component using next-themes
+- Applied brand-specific colors for light mode (gold, highGold, power)
+- Configured Tailwind with class-based dark mode and extended custom palette
+- Updated global styles for smooth background and text transitions
+- Verified toggle works correctly between light and dark modes
+
+------------------------
