@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import SlideImagesPage from "./slide-images/page";
-
+import VerticalStackSlider from "@/components/home/VerticalStackSlider";
 const WEBSITE_TABS = ["Slide Images"]; // add General, Permissions, Notifications later
 
 export default function WebsitePage() {
@@ -31,7 +30,7 @@ export default function WebsitePage() {
       </nav>
 
       <div>
-        {activeTab === "Slide Images" && <SlideImagesPage />}
+        {activeTab === "Slide Images" && <VerticalStackSlider />}
         {/* Add more Website sub-pages here */}
       </div>
     </div>
