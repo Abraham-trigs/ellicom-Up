@@ -32,7 +32,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(job);
+    // To return createdBy and handledBy objects after creation,
+    // fetch the job with relations again or include them if possible
+    const jobWithUsers = await prisma.job.findUnique({
+      where: { id: job.id },
+      include: {
+        createdBy: { select: { id: true, name: true, email: true } },
+        handledBy: { select: { id: true, name: true, email: true } },
+      },
+    });
+
+    return NextResponse.json(jobWithUsers);
   } catch (error) {
     console.error('[POST /api/jobs]', error);
     return new NextResponse('Internal Server Error', { status: 500 });

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useJobStore } from "../../../lib/store/JobStore";
+import type { JobWithUsers } from "../../../lib/store/JobStore";
 
 const JOB_STATUSES = ["All", "COMPLETED", "CANCELLED", "IN_PROGRESS"] as const;
 
@@ -55,7 +56,7 @@ export default function JobsPage() {
             gap-4 max-h-[80vh] overflow-y-auto pr-2
           "
         >
-          {filteredJobs.map((job) => (
+          {filteredJobs.map((job: JobWithUsers) => (
             <li
               key={job.id}
               className="
@@ -86,13 +87,13 @@ export default function JobsPage() {
                 </span>
                 <span className="truncate">
                   <strong>Created By:</strong>{" "}
-                  {job.createdBy?.name || "Unknown"}
+                  {job.createdBy?.name ?? "Unknown"}
                 </span>
               </div>
               <div className="flex justify-between text-xs text-ground">
                 <span className="truncate">
                   <strong>Handled By:</strong>{" "}
-                  {job.handledBy?.name || "Unassigned"}
+                  {job.handledBy?.name ?? "Unassigned"}
                 </span>
               </div>
             </li>
