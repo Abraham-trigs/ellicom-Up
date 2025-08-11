@@ -13,7 +13,7 @@ export default function PricingPage() {
   const {
     jobPricingList,
     fetchJobPricing,
-    createJobPricing,
+    addJobPricing, // <-- changed from createJobPricing to addJobPricing
     updateJobPricing,
     deleteJobPricing,
   } = useJobPricingStore();
@@ -32,7 +32,6 @@ export default function PricingPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Start with no active tab, so form is hidden by default
   const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
@@ -45,7 +44,6 @@ export default function PricingPage() {
     );
   }, [jobPricingList, filterJobType]);
 
-  // Toggle the tab on click: open if closed, close if open
   const toggleTab = (tabName: string) => {
     setActiveTab((current) => (current === tabName ? "" : tabName));
   };
@@ -54,7 +52,7 @@ export default function PricingPage() {
     if (editingId) {
       await updateJobPricing(editingId, formData);
     } else {
-      await createJobPricing(formData);
+      await addJobPricing(formData); // <-- changed here as well
     }
 
     setFormData({
@@ -66,20 +64,20 @@ export default function PricingPage() {
       notes: "",
     });
     setEditingId(null);
-    setActiveTab(""); // close form after submit
+    setActiveTab("");
   };
 
   const handleEdit = (item: JobPricing) => {
     setFormData({
       jobType: item.jobType,
-      materialType: item.materialType ?? null, // Fix here: force null if undefined
+      materialType: item.materialType ?? null,
       variable: item.variable,
       unitPrice: item.unitPrice,
       modifiers: item.modifiers,
       notes: item.notes ?? "",
     });
     setEditingId(item.id);
-    setActiveTab("addPricing"); // open form when editing
+    setActiveTab("addPricing");
   };
 
   const handleDelete = async (id: string) => {
@@ -111,11 +109,9 @@ export default function PricingPage() {
               Add Pricing
             </button>
           </li>
-          {/* Future tabs go here */}
         </ul>
       </nav>
 
-      {/* Form shows only when Add Pricing tab is active */}
       {activeTab === "addPricing" && (
         <Card
           className="bg-ground shadow-sm rounded-md text-inactive
@@ -223,7 +219,6 @@ export default function PricingPage() {
         </Card>
       )}
 
-      {/* Filter Dropdown */}
       <div className="flex items-center gap-4">
         <Label className="text-inactive dark:text-textSecondary">
           Filter by Job Type:
@@ -243,7 +238,6 @@ export default function PricingPage() {
         </select>
       </div>
 
-      {/* Table */}
       <div
         className="overflow-auto border border-border rounded-lg shadow-sm bg-ground
                    text-power dark:bg-surface dark:text-textPrimary"

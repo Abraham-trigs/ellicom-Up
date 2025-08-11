@@ -18,8 +18,8 @@ type JobPricing = {
   unitPrice: number;
   modifiers: string[];
   notes?: string | null;
-  createdAt: Date;  // <-- Date now, not string
-  updatedAt: Date;  // <-- Date now, not string
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 type State = {
@@ -131,6 +131,7 @@ export const useJobPricingStore = create<State>()(
               if (!res.ok) throw new Error("Failed to update pricing");
               const updatedRaw = await res.json();
 
+              // Convert updated entry dates to Date objects
               const updated = {
                 ...updatedRaw,
                 createdAt: new Date(updatedRaw.createdAt),
