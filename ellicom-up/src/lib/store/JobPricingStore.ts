@@ -27,10 +27,11 @@ type State = {
   isLoading: boolean;
   error: string | null;
 
+  // Computed value
   jobTypes: string[];
 
   fetchJobPricing: () => Promise<void>;
-  addJobPricing: (
+  createJobPricing: (
     data: Omit<JobPricing, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   updateJobPricing: (
@@ -85,7 +86,7 @@ export const useJobPricingStore = create<State>()(
             debouncedFetch();
           },
 
-          addJobPricing: async (payload) => {
+          createJobPricing: async (payload) => {
             set({ isLoading: true, error: null });
             try {
               const res = await fetch("/api/job-pricing", {
@@ -145,7 +146,7 @@ export const useJobPricingStore = create<State>()(
         };
       },
       {
-        name: "jobPricingStore",
+        name: "jobPricingStore", // localStorage key
         partialize: (state) => ({
           jobPricingList: state.jobPricingList,
         }),
