@@ -45,7 +45,7 @@ export const useJobPricingStore = create<State>()(
   devtools(
     persist(
       (set, get) => {
-        // Debounced version of fetch to throttle calls
+        // Debounced fetch to avoid too many requests
         const debouncedFetch = debounce(async () => {
           const currentData = get().jobPricingList;
           const isFirstLoad = currentData.length === 0;
@@ -61,19 +61,19 @@ export const useJobPricingStore = create<State>()(
             if (!res.ok) throw new Error("Failed to fetch pricing data");
             const freshData: JobPricing[] = await res.json();
 
-            // Deep diff to avoid useless updates
+            // Update only if data changed
             const isDifferent =
               JSON.stringify(freshData) !== JSON.stringify(get().jobPricingList);
 
             if (isDifferent) {
               set({ jobPricingList: freshData });
             }
-          } catch (err: any) {
+          } catch (err) {
             set({ error: "Failed to fetch pricing data" });
           } finally {
             set({ isLoading: false });
           }
-        }, 500); // 500ms debounce delay
+        }, 500);
 
         return {
           jobPricingList: [],
