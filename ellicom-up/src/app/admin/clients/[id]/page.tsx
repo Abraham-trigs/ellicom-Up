@@ -1,5 +1,3 @@
-// app/admin/client/[id]/page.tsx
-
 export default function ClientDetailPage() {
   // Dummy static UI — replace with real client data once ready
   const client = {
@@ -12,10 +10,10 @@ export default function ClientDetailPage() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
+    <div className="min-h-screen px-6 py-10 bg-white dark:bg-surface text-gray-900 dark:text-textPrimary">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-4">{client.name}</h1>
-        <div className="space-y-2 text-gray-700">
+        <div className="space-y-2 text-gray-700 dark:text-textSecondary">
           <p>
             <span className="font-semibold">Email:</span> {client.email}
           </p>

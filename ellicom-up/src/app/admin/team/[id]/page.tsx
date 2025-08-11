@@ -1,7 +1,4 @@
-// app/admin/team/[id]/page.tsx
-
 export default function TeamMemberPage() {
-  // Static dummy team member data
   const user = {
     name: "Angela Mensah",
     email: "angela@company.com",
@@ -13,11 +10,11 @@ export default function TeamMemberPage() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-10 bg-white text-gray-900">
+    <div className="min-h-screen px-6 py-10 bg-white dark:bg-surface text-gray-900 dark:text-textPrimary">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-4">{user.name}</h1>
 
-        <div className="space-y-2 text-gray-700">
+        <div className="space-y-2 text-gray-700 dark:text-textSecondary">
           <p>
             <span className="font-semibold">Email:</span> {user.email}
           </p>
