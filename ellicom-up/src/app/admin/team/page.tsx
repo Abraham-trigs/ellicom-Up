@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useStaffStore, UserRole, User } from "@/lib/store/StaffStore";
+import { useStaffStore } from "@/lib/store/StaffStore";
 
 const ROLES = ["All", "STAFF", "ADMIN", "SECRETARY"] as const;
 
@@ -11,13 +11,12 @@ export default function TeamPage() {
   type Tab = (typeof ROLES)[number] | "addMember";
   const [activeTab, setActiveTab] = useState<Tab>("All");
 
-  // Form state removed here because StaffStore currently doesn't support add/update/delete
+  // Form state removed because no add/edit support yet
 
   useEffect(() => {
     fetchStaffUsers();
   }, [fetchStaffUsers]);
 
-  // Filter users client-side by role tab
   const filteredMembers = useMemo(() => {
     if (activeTab === "All" || activeTab === "addMember") return users;
     return users.filter((user) => user.role === activeTab);
@@ -45,7 +44,7 @@ export default function TeamPage() {
               </button>
             </li>
           ))}
-          {/* Remove addMember tab since no add/edit support yet */}
+          {/* Removed addMember tab since no add/edit support yet */}
         </ul>
       </nav>
 
@@ -54,7 +53,7 @@ export default function TeamPage() {
         <>
           {filteredMembers.length === 0 ? (
             <p className="text-inactive dark:text-textMuted italic">
-              {`No members found for role '${activeTab}'.`}
+              No members found for role &apos;{activeTab}&apos;.
             </p>
           ) : (
             <ul className="space-y-4 max-w-3xl">
