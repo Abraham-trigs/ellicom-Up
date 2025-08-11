@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import AuthButton from "../AuthButton";
 
+const easeCurve = [0.42, 0, 0.58, 1]; // cubic-bezier easing for smooth transitions
+
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,14 +40,14 @@ export default function Navbar() {
       transition: {
         when: "beforeChildren",
         staggerChildren: 0.08,
-        ease: "easeOut",
+        ease: easeCurve,
         duration: 0.25,
       },
     },
     exit: {
       height: 0,
       opacity: 0,
-      transition: { when: "afterChildren", duration: 0.2, ease: "easeIn" },
+      transition: { when: "afterChildren", duration: 0.2, ease: easeCurve },
     },
   };
 
