@@ -13,7 +13,7 @@ export default function PricingPage() {
   const {
     jobPricingList,
     fetchJobPricing,
-    addJobPricing,
+    createJobPricing,
     updateJobPricing,
     deleteJobPricing,
   } = useJobPricingStore();
@@ -23,7 +23,7 @@ export default function PricingPage() {
     Omit<JobPricing, "id" | "createdAt" | "updatedAt">
   >({
     jobType: "",
-    materialType: "",
+    materialType: null,
     variable: "",
     unitPrice: 0,
     modifiers: [],
@@ -32,6 +32,7 @@ export default function PricingPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // Start with no active tab, so form is hidden by default
   const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function PricingPage() {
     );
   }, [jobPricingList, filterJobType]);
 
+  // Toggle the tab on click: open if closed, close if open
   const toggleTab = (tabName: string) => {
     setActiveTab((current) => (current === tabName ? "" : tabName));
   };
@@ -52,32 +54,32 @@ export default function PricingPage() {
     if (editingId) {
       await updateJobPricing(editingId, formData);
     } else {
-      await addJobPricing(formData);
+      await createJobPricing(formData);
     }
 
     setFormData({
       jobType: "",
-      materialType: "",
+      materialType: null,
       variable: "",
       unitPrice: 0,
       modifiers: [],
       notes: "",
     });
     setEditingId(null);
-    setActiveTab("");
+    setActiveTab(""); // close form after submit
   };
 
   const handleEdit = (item: JobPricing) => {
     setFormData({
       jobType: item.jobType,
-      materialType: item.materialType ?? "",
+      materialType: item.materialType ?? null, // Fix here: force null if undefined
       variable: item.variable,
       unitPrice: item.unitPrice,
       modifiers: item.modifiers,
       notes: item.notes ?? "",
     });
     setEditingId(item.id);
-    setActiveTab("addPricing");
+    setActiveTab("addPricing"); // open form when editing
   };
 
   const handleDelete = async (id: string) => {
@@ -93,6 +95,7 @@ export default function PricingPage() {
         Job Pricing Manager
       </h1>
 
+      {/* Navbar Tabs */}
       <nav className="border-b border-border mb-6">
         <ul className="flex space-x-6 text-sm font-medium">
           <li>
@@ -108,9 +111,11 @@ export default function PricingPage() {
               Add Pricing
             </button>
           </li>
+          {/* Future tabs go here */}
         </ul>
       </nav>
 
+      {/* Form shows only when Add Pricing tab is active */}
       {activeTab === "addPricing" && (
         <Card
           className="bg-ground shadow-sm rounded-md text-inactive
@@ -218,6 +223,7 @@ export default function PricingPage() {
         </Card>
       )}
 
+      {/* Filter Dropdown */}
       <div className="flex items-center gap-4">
         <Label className="text-inactive dark:text-textSecondary">
           Filter by Job Type:
@@ -237,6 +243,7 @@ export default function PricingPage() {
         </select>
       </div>
 
+      {/* Table */}
       <div
         className="overflow-auto border border-border rounded-lg shadow-sm bg-ground
                    text-power dark:bg-surface dark:text-textPrimary"
