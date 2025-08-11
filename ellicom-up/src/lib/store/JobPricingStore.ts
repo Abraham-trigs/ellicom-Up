@@ -27,7 +27,6 @@ type State = {
   isLoading: boolean;
   error: string | null;
 
-  // Computed value
   jobTypes: string[];
 
   fetchJobPricing: () => Promise<void>;
@@ -45,7 +44,6 @@ export const useJobPricingStore = create<State>()(
   devtools(
     persist(
       (set, get) => {
-        // Debounced fetch to avoid too many requests
         const debouncedFetch = debounce(async () => {
           const currentData = get().jobPricingList;
           const isFirstLoad = currentData.length === 0;
@@ -61,14 +59,13 @@ export const useJobPricingStore = create<State>()(
             if (!res.ok) throw new Error("Failed to fetch pricing data");
             const freshData: JobPricing[] = await res.json();
 
-            // Update only if data changed
             const isDifferent =
               JSON.stringify(freshData) !== JSON.stringify(get().jobPricingList);
 
             if (isDifferent) {
               set({ jobPricingList: freshData });
             }
-          } catch (err) {
+          } catch (err: any) {
             set({ error: "Failed to fetch pricing data" });
           } finally {
             set({ isLoading: false });
@@ -148,7 +145,7 @@ export const useJobPricingStore = create<State>()(
         };
       },
       {
-        name: "jobPricingStore", // localStorage key
+        name: "jobPricingStore",
         partialize: (state) => ({
           jobPricingList: state.jobPricingList,
         }),
