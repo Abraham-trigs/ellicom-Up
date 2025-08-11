@@ -150,7 +150,7 @@ export default function ClientsPage() {
         <>
           {filteredClients.length === 0 ? (
             <p className="text-inactive dark:text-textMuted italic">
-              No clients found for role "{activeTab}".
+              No clients found for role '{activeTab}'.
             </p>
           ) : (
             <ul className="space-y-4 max-w-3xl">
