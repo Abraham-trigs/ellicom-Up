@@ -13,7 +13,7 @@ export default function PricingPage() {
   const {
     jobPricingList,
     fetchJobPricing,
-    addJobPricing, // <-- changed from createJobPricing to addJobPricing
+    createJobPricing,
     updateJobPricing,
     deleteJobPricing,
   } = useJobPricingStore();
@@ -31,7 +31,6 @@ export default function PricingPage() {
   });
 
   const [editingId, setEditingId] = useState<string | null>(null);
-
   const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export default function PricingPage() {
     if (editingId) {
       await updateJobPricing(editingId, formData);
     } else {
-      await addJobPricing(formData); // <-- changed here as well
+      await createJobPricing(formData);
     }
 
     setFormData({
@@ -70,10 +69,11 @@ export default function PricingPage() {
   const handleEdit = (item: JobPricing) => {
     setFormData({
       jobType: item.jobType,
-      materialType: item.materialType ?? null,
+      // Fix the type issue by explicitly normalizing undefined to null
+      materialType: item.materialType === undefined ? null : item.materialType,
       variable: item.variable,
       unitPrice: item.unitPrice,
-      modifiers: item.modifiers,
+      modifiers: item.modifiers ?? [],
       notes: item.notes ?? "",
     });
     setEditingId(item.id);
