@@ -293,6 +293,7 @@ export default function PricingPage() {
                         handleEdit({
                           ...item,
                           materialType: item.materialType ?? null,
+                          notes: item.notes ?? null, // <-- this line fixes your error
                         })
                       }
                     >
