@@ -1,5 +1,5 @@
 import Navbar from "@/components/home/Navbar";
-import { Google } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa";
 
 export default function LoginPage() {
@@ -85,7 +85,7 @@ export default function LoginPage() {
               className="flex items-center gap-2 border border-border dark:border-border px-4 py-2 rounded hover:bg-ground dark:hover:bg-ground transition text-textPrimary dark:text-textPrimary"
               // onClick handlers later
             >
-              <Google className="w-5 h-5" />
+              <FaGoogle className="w-5 h-5" />
               Sign up with Google
             </button>
             <button className="flex items-center gap-2 border border-border dark:border-border px-4 py-2 rounded hover:bg-ground dark:hover:bg-ground transition text-textPrimary dark:text-textPrimary">
