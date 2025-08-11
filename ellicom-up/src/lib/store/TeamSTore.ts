@@ -29,6 +29,7 @@ export const useTeamStore = create<TeamStore>((set) => ({
     }
   },
 
+  
   addMember: async (member) => {
     try {
       const res = await fetch('/api/team', {
