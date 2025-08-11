@@ -69,7 +69,6 @@ export default function PricingPage() {
   const handleEdit = (item: JobPricing) => {
     setFormData({
       jobType: item.jobType,
-      // Fix the type issue by explicitly normalizing undefined to null
       materialType: item.materialType === undefined ? null : item.materialType,
       variable: item.variable,
       unitPrice: item.unitPrice,
@@ -290,7 +289,12 @@ export default function PricingPage() {
                       variant="secondary"
                       className="bg-sea text-power hover:bg-neonSea
                                  dark:bg-gold dark:text-power dark:hover:bg-highGold"
-                      onClick={() => handleEdit(item)}
+                      onClick={() =>
+                        handleEdit({
+                          ...item,
+                          materialType: item.materialType ?? null,
+                        })
+                      }
                     >
                       Edit
                     </Button>
