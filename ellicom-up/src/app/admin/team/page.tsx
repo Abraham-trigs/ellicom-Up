@@ -54,7 +54,7 @@ export default function TeamPage() {
         <>
           {filteredMembers.length === 0 ? (
             <p className="text-inactive dark:text-textMuted italic">
-              No members found for role '{activeTab}'.
+              No members found for role &apos;{activeTab}&apos;.
             </p>
           ) : (
             <ul className="space-y-4 max-w-3xl">
