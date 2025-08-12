@@ -1,258 +1,50 @@
 "use client";
 
-import React, { FC } from "react";
-import useJobCardStore from "@/lib/store/JobCardStore";
-import { useJobPricingStore } from "@/lib/store/JobPricingStore";
+import React from "react";
 
-import LargeFormatRecorder from "@/components/job/Recorders/LargeFormatRecorder";
-import PapperPrintingRecorder from "@/components/job/Recorders/PapperPrintingRecorder";
-import ScanningRecorder from "@/components/job/Recorders/ScanningRecorder";
-import PhotocopyRecorder from "@/components/job/Recorders/PhotocopyRecorder";
-
-type Job = {
-  id: string;
+interface DesigningRecorderProps {
   jobType: string | null;
-  paperSize: string | null;
-  quantity: number | null;
-  colorType: string;
-  sideType: string;
-  fileAttached: boolean;
-  material: string | null;
-};
-
-type DesigningRecorderProps = {
-  jobType: string | null;
-  paperSize: string | null;
-  quantity: number | null;
-  colorType: string;
-  sideType: string;
-  fileAttached: boolean;
-  material: string | null;
-  isEditing: boolean;
-  onChange: {
-    setJobType: (v: string) => void;
-    setMaterial: (v: string) => void;
-    setPaperSize?: (v: string) => void;
-    setQuantity?: (v: number) => void;
-    setColorType?: (v: string) => void;
-    toggleSideType?: () => void;
-    setFileAttached?: (v: boolean) => void;
-  };
   variable: string;
   unitPrice: number;
-};
+  isEditing: boolean;
+  onChange: {
+    setJobType: (jobType: string) => void;
+    setMaterial: (material: string) => void;
+  };
+}
 
-const DesigningRecorder: FC<DesigningRecorderProps> = ({
+export default function DesigningRecorder({
   jobType,
-  paperSize,
-  quantity,
-  colorType,
-  sideType,
-  fileAttached,
-  material,
-  isEditing,
-  onChange,
   variable,
   unitPrice,
-}) => {
+  isEditing,
+  onChange,
+}: DesigningRecorderProps) {
+  // Example render — replace with your actual UI logic
   return (
-    <div className="p-4 bg-container rounded-md">
-      <h3 className="text-lg font-semibold mb-2">Designing Job</h3>
+    <div className="designing-recorder">
       <p>Job Type: {jobType}</p>
-      <p>Material (variable): {variable}</p>
-      <p>Unit Price: ${unitPrice.toFixed(2)}</p>
-      <p>Quantity: {quantity}</p>
-      <p>Color Type: {colorType}</p>
-      <p>Side Type: {sideType}</p>
-      <p>File Attached: {fileAttached ? "Yes" : "No"}</p>
+      <p>Material: {variable}</p>
+      <p>Unit Price: {unitPrice}</p>
+      <p>{isEditing ? "Editing mode" : "Read-only mode"}</p>
 
+      {/* Example input to update jobType */}
       {isEditing && (
-        <div className="mt-4 space-y-2">
-          <label>
-            Material:
-            <input
-              type="text"
-              value={material || ""}
-              onChange={(e) => onChange.setMaterial(e.target.value)}
-              className="border rounded px-2 py-1 ml-2"
-            />
-          </label>
-        </div>
+        <>
+          <input
+            type="text"
+            value={jobType || ""}
+            onChange={(e) => onChange.setJobType(e.target.value)}
+            placeholder="Set Job Type"
+          />
+          <input
+            type="text"
+            value={variable}
+            onChange={(e) => onChange.setMaterial(e.target.value)}
+            placeholder="Set Material"
+          />
+        </>
       )}
-    </div>
-  );
-};
-
-export default function JobRecorder() {
-  const {
-    jobType,
-    paperSize,
-    quantity,
-    colorType,
-    sideType,
-    fileAttached,
-    material,
-    savedJobs,
-    editingJobId,
-    editedJob,
-
-    setJobType,
-    setPaperSize,
-    setQuantity,
-    setColorType,
-    toggleSideType,
-    setMaterial,
-    setFileAttached,
-
-    startEditJob,
-    cancelEditJob,
-    saveEditedJob,
-    setEditedJobField,
-  } = useJobCardStore();
-
-  // Grab pricing list from pricing store
-  const jobPricingList = useJobPricingStore((state) => state.jobPricingList);
-
-  // Helper: find unit price for a given jobType & material (variable)
-  const findUnitPrice = (type: string | null, variable: string | null) => {
-    if (!type) return 0;
-    const pricing = jobPricingList.find(
-      (p) =>
-        p.jobType === type &&
-        (p.variable === variable || p.variable === null || p.variable === "")
-    );
-    return pricing ? pricing.unitPrice : 0;
-  };
-
-  const liveJob: Job = {
-    id: "live",
-    jobType,
-    paperSize,
-    quantity,
-    colorType,
-    sideType,
-    fileAttached,
-    material,
-  };
-
-  const jobsToRender: Job[] = [liveJob, ...savedJobs];
-
-  if (jobsToRender.length === 0) {
-    return (
-      <div className="mx-2 w-full max-w-md sm:max-w-lg lg:max-w-xl border-2 border-coHead bg-darkSea rounded-2xl p-4">
-        <p className="text-center text-coHead">No jobs to display.</p>
-      </div>
-    );
-  }
-
-  const renderJob = (job: Job) => {
-    const isLive = job.id === "live";
-    const isEditing = !isLive && editingJobId === job.id;
-    const currentJob = isEditing ? editedJob! : job;
-
-    const commonProps = {
-      jobType: currentJob.jobType,
-      paperSize: currentJob.paperSize,
-      quantity: currentJob.quantity,
-      colorType: currentJob.colorType,
-      sideType: currentJob.sideType,
-      fileAttached: currentJob.fileAttached,
-      material: currentJob.material,
-      isEditing: isLive || isEditing,
-      onChange: isLive
-        ? {
-            setJobType,
-            setPaperSize,
-            setQuantity,
-            setColorType,
-            toggleSideType,
-            setMaterial,
-            setFileAttached,
-          }
-        : {
-            setJobType: (v: string) => setEditedJobField("jobType", v),
-            setPaperSize: (v: string) => setEditedJobField("paperSize", v),
-            setQuantity: (v: number) => setEditedJobField("quantity", v),
-            setColorType: (v: string) => setEditedJobField("colorType", v),
-            toggleSideType: () => {
-              setEditedJobField(
-                "sideType",
-                currentJob.sideType === "Front" ? "Front & Back" : "Front"
-              );
-            },
-            setMaterial: (v: string) => setEditedJobField("material", v),
-            setFileAttached: (v: boolean) =>
-              setEditedJobField("fileAttached", v),
-          },
-    };
-
-    const renderRecorderByType = () => {
-      switch (currentJob.jobType) {
-        case "Photocopy":
-          return <PhotocopyRecorder {...commonProps} />;
-        case "Printing":
-          return <PapperPrintingRecorder {...commonProps} />;
-        case "Large Format":
-          return <LargeFormatRecorder {...commonProps} />;
-        case "Scanning":
-          return <ScanningRecorder {...commonProps} />;
-        case "Designing":
-          return (
-            <DesigningRecorder
-              {...commonProps}
-              variable={currentJob.material || ""}
-              unitPrice={findUnitPrice("Designing", currentJob.material)}
-            />
-          );
-        default:
-          return null;
-      }
-    };
-
-    return (
-      <div key={job.id} className="relative border p-4 rounded-lg bg-surface">
-        {renderRecorderByType()}
-
-        {!isLive && (
-          <div className="mt-2 flex justify-end gap-2">
-            {!isEditing && (
-              <button
-                className="bg-sea text-white px-3 py-1 rounded hover:bg-high transition"
-                onClick={() => startEditJob(job.id)}
-              >
-                Edit
-              </button>
-            )}
-            {isEditing && (
-              <>
-                <button
-                  className="bg-gold text-black px-3 py-1 rounded hover:bg-highGold transition"
-                  onClick={() => {
-                    if (editedJob) saveEditedJob(editedJob);
-                  }}
-                >
-                  Save Changes
-                </button>
-                <button
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
-                  onClick={() => cancelEditJob()}
-                >
-                  Cancel
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  return (
-    <div className="mx-2 w-full max-w-md sm:max-w-lg lg:max-w-xl border-2 border-coHead bg-darkSea rounded-2xl p-4 space-y-6">
-      {jobsToRender.map((job) => {
-        if (job.id === "live" && !job.jobType) return null;
-        return renderJob(job);
-      })}
     </div>
   );
 }
