@@ -1,7 +1,15 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { prisma } from "@/lib/prisma/prisma";
 
-const handler = NextAuth({
+function getNextMidnightTimestamp() {
+  const now = new Date();
+  const nextMidnight = new Date(now);
+  nextMidnight.setUTCHours(24, 0, 0, 0); // Next midnight UTC
+  return Math.floor(nextMidnight.getTime() / 1000);
+}
+
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -12,11 +20,39 @@ const handler = NextAuth({
   session: { strategy: "jwt" },
   callbacks: {
     async session({ session, token }) {
-      // Add user ID or roles here if needed
-      session.user.id = token.sub;
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
       return session;
     },
+
+    async jwt({ token, user }) {
+      // On first login, pull fresh data from DB
+      if (user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email as string },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+        }
+      }
+
+      // If STAFF or SECRETARY, expire token at next midnight UTC
+      if (token.role === "STAFF" || token.role === "SECRETARY") {
+        token.exp = getNextMidnightTimestamp();
+      } else {
+        // Default expiration: 30 days from now
+        const now = Math.floor(Date.now() / 1000);
+        token.exp = now + 60 * 60 * 24 * 30;
+      }
+
+      return token;
+    },
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
