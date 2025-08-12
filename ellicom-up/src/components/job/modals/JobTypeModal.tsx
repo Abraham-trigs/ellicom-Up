@@ -156,7 +156,9 @@ export default function JobTypeModal({
               <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
                 {filteredJobTypes.map((type, index) => (
                   <button
-                    ref={(el) => (itemRefs.current[index] = el)}
+                    ref={(el) => {
+                      itemRefs.current[index] = el;
+                    }}
                     key={type}
                     onClick={() => {
                       onSelect(type);

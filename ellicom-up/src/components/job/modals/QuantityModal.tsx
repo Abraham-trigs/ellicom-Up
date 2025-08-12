@@ -54,7 +54,7 @@ export default function QuantityModal({
                 <button
                   key={qty}
                   onClick={() => {
-                    onSelect(qty); // ✅ Now recognized
+                    onSelect(qty);
                     onClose();
                   }}
                   className="px-4 py-2 rounded-lg bg-sea text-ground hover:bg-high font-semibold"
