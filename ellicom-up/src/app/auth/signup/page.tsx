@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/home/Navbar";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,8 +39,9 @@ export default function SignupPage() {
       if (!res.ok) {
         setError(data.error || "Something went wrong");
       } else {
-        setSuccess("Account created successfully! You can now log in.");
+        setSuccess("Account created successfully! Redirecting...");
         setFormData({ name: "", email: "", phone: "", password: "" });
+        router.push("/app"); // <-- redirect here after success
       }
     } catch (err) {
       setError("Network error. Try again.");
