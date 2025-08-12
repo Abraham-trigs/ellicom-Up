@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
-import LayoutShell from "@/components/layout/layoutShell";
+import LayoutShell from "@/components/layout/layoutshell/admin/layoutShell";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (

@@ -7,6 +7,7 @@ import { Sun, Moon, Menu, X } from "lucide-react";
 import { motion, AnimatePresence, easeIn, easeOut } from "framer-motion";
 import clsx from "clsx";
 import AuthButton from "../auth/AuthButton";
+import ToDashboardButton from "./ToDashbaordButton";
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -77,6 +78,7 @@ export default function Navbar() {
         <div className="flex-1 flex justify-center">
           <AuthButton />
         </div>
+        <ToDashboardButton />
 
         {/* Right - Nav Links + Controls */}
         <div className="flex-1 flex justify-end items-center gap-4">

@@ -4,27 +4,45 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = "superadmin@example.com";
-  const existing = await prisma.user.findUnique({ where: { email } });
+  // SuperAdmin data
+  const superAdminEmail = "superadmin@example.com";
+  const existingSuperAdmin = await prisma.user.findUnique({ where: { email: superAdminEmail } });
 
-  if (existing) {
+  if (!existingSuperAdmin) {
+    const hashedPassword = await bcrypt.hash("SuperSecretPassword123!", 10);
+    const superAdmin = await prisma.user.create({
+      data: {
+        name: "Super Admin",
+        email: superAdminEmail,
+        password: hashedPassword,
+        role: "SUPERADMIN",
+        phone: "+00000000000",
+      },
+    });
+    console.log("Created SuperAdmin user:", superAdmin.email);
+  } else {
     console.log("SuperAdmin user already exists.");
-    return;
   }
 
-  const hashedPassword = await bcrypt.hash("SuperSecretPassword123!", 10);
+  // Admin data
+  const adminEmail = "admin@example.com";
+  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
 
-  const user = await prisma.user.create({
-    data: {
-      name: "Super Admin",
-      email,
-      password: hashedPassword,
-      role: "SUPERADMIN",
-      phone: "+00000000000",
-    },
-  });
-
-  console.log("Created SuperAdmin user:", user.email);
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash("AdminPassword123!", 10);
+    const admin = await prisma.user.create({
+      data: {
+        name: "Admin User",
+        email: adminEmail,
+        password: hashedPassword,
+        role: "ADMIN",
+        phone: "+00000000001",
+      },
+    });
+    console.log("Created Admin user:", admin.email);
+  } else {
+    console.log("Admin user already exists.");
+  }
 }
 
 main()
@@ -35,6 +53,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-
-  

@@ -18,15 +18,15 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-  { label: "Jobs", icon: Briefcase, href: "/admin/jobs" },
-  { label: "Clients", icon: Users, href: "/admin/clients" },
-  { label: "Invoices", icon: FileText, href: "/admin/invoices" },
-  { label: "Stocks", icon: Boxes, href: "/admin/stocks" },
-  { label: "Team", icon: UserCog, href: "/admin/team" },
-  { label: "Pricing", icon: Tag, href: "/admin/pricing" },
-  { label: "Add Job", icon: PlusCircle, href: "/admin/addJob" },
-  { label: "Settings", icon: Settings, href: "/admin/settings" },
+  { label: "Dashboard", icon: LayoutDashboard, href: "dashboard/admin" },
+  { label: "Jobs", icon: Briefcase, href: "dashboard/admin/jobs" },
+  { label: "Clients", icon: Users, href: "dashboard/admin/clients" },
+  { label: "Invoices", icon: FileText, href: "dashboard/admin/invoices" },
+  { label: "Stocks", icon: Boxes, href: "dashboard/admin/stocks" },
+  { label: "Team", icon: UserCog, href: "dashboard/admin/team" },
+  { label: "Pricing", icon: Tag, href: "dashboard/admin/pricing" },
+  { label: "Add Job", icon: PlusCircle, href: "dashboard/admin/addJob" },
+  { label: "Settings", icon: Settings, href: "dashboard/admin/settings" },
 ];
 
 export default function AdminSidebar() {
