@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useJobStore } from "../../../lib/store/JobStore";
-import type { JobWithUsers } from "../../../lib/store/JobStore";
+import { useJobStore } from "../../../../lib/store/JobStore";
+import type { JobWithUsers } from "../../../../lib/store/JobStore";
 
 const JOB_STATUSES = ["All", "COMPLETED", "CANCELLED", "IN_PROGRESS"] as const;
 

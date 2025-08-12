@@ -2,26 +2,25 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
 
   const publicRoutes = ["/auth/login", "/auth/signup"];
 
   useEffect(() => {
-    // If loading, do nothing yet
     if (status === "loading") return;
 
     const userRole = session?.user?.role || "GUEST";
-    const onPublicRoute = publicRoutes.includes(router.pathname);
+    const onPublicRoute = publicRoutes.includes(pathname);
 
-    // If user role is GUEST or no session, allow access only to public routes
     if ((userRole === "GUEST" || !session) && !onPublicRoute) {
       router.push("/auth/login");
     }
-  }, [status, session, router]);
+  }, [status, session, router, pathname]);
 
   if (status === "loading") return <div>Loading...</div>;
 
