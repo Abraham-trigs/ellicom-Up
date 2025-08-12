@@ -17,7 +17,7 @@ export default function AuthButton() {
     return (
       <button
         onClick={() => router.push("/auth/login")}
-        className="px-4 py-2 rounded bg-gold dark:bg-gold text-head dark:text-head font-semibold hover:bg-highGold dark:hover:bg-highGold transition"
+        className="px-4 py-2 rounded bg-gold dark:bg-gold text-ground dark:text-head font-semibold hover:bg-highGold dark:hover:bg-highGold transition"
       >
         Login
       </button>

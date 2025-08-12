@@ -1,19 +1,64 @@
 "use client";
 
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import Navbar from "@/components/home/Navbar";
 import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // Basic validation (optional)
+    if (!email || !password) return alert("Please fill in both fields");
+
+    // Sign in with credentials provider
+    const res = await signIn("credentials", {
+      redirect: true,
+      email,
+      password,
+      callbackUrl: "/",
+    });
+
+    // You can handle res here if redirect:false, but with redirect:true it'll auto redirect
+  }
+
   return (
     <>
       <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-background dark:bg-background">
         <div className="bg-surface dark:bg-surface p-8 rounded-lg shadow-md w-full max-w-sm">
-          <h2 className="text-head dark:text-head text-3xl font-extrabold mb-8 text-center">
+          <h2 className="text-ground dark:text-head text-3xl font-extrabold mb-8 text-center">
             Log In to Ellicom Hub
           </h2>
+
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-6">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border border-border dark:border-border rounded bg-container dark:bg-container text-textPrimary dark:text-textPrimary focus:outline-none focus:ring-2 focus:ring-sea dark:focus:ring-sea transition"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border border-border dark:border-border rounded bg-container dark:bg-container text-textPrimary dark:text-textPrimary focus:outline-none focus:ring-2 focus:ring-sea dark:focus:ring-sea transition"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-gold dark:bg-gold text-head dark:text-head font-semibold py-3 rounded hover:bg-highGold dark:hover:bg-highGold transition"
+            >
+              Log In
+            </button>
+          </form>
 
           <div className="flex flex-col gap-4 mb-6">
             <button

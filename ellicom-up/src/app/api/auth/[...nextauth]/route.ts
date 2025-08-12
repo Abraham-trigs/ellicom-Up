@@ -28,22 +28,27 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user }) {
-      // On first login, pull fresh data from DB
       if (user) {
-        const dbUser = await prisma.user.findUnique({
+        // Use upsert to create or update user and ensure role is CLIENT
+        const dbUser = await prisma.user.upsert({
           where: { email: user.email as string },
+          update: {
+            name: user.name || undefined,
+          },
+          create: {
+            email: user.email as string,
+            name: user.name || "No Name",
+            role: "CLIENT", // Always set new users as CLIENT
+          },
         });
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.role = dbUser.role;
-        }
+
+        token.id = dbUser.id;
+        token.role = dbUser.role;
       }
 
-      // If STAFF or SECRETARY, expire token at next midnight UTC
       if (token.role === "STAFF" || token.role === "SECRETARY") {
         token.exp = getNextMidnightTimestamp();
       } else {
-        // Default expiration: 30 days from now
         const now = Math.floor(Date.now() / 1000);
         token.exp = now + 60 * 60 * 24 * 30;
       }
