@@ -16,9 +16,7 @@ export default function ImageDisplay({
   alt = "Ellicom Hub banner",
   images,
 }: ImageDisplayProps) {
-  const smallestImage = images[0];
   const largestImage = images[images.length - 1];
-  const srcSet = images.map((img) => `${img.src} ${img.width}w`).join(", ");
   const sizes = "100vw";
 
   return (
@@ -30,7 +28,6 @@ export default function ImageDisplay({
           fill
           priority
           sizes={sizes}
-          srcSet={srcSet}
           className="object-cover"
         />
       </div>
