@@ -29,28 +29,35 @@ export const authOptions: NextAuthOptions = {
 
     async jwt({ token, user }) {
       if (user) {
-        // Use upsert to create or update user and ensure role is CLIENT
-        const dbUser = await prisma.user.upsert({
+        // Check if user already exists in DB
+        const existingUser = await prisma.user.findUnique({
           where: { email: user.email as string },
-          update: {
-            name: user.name || undefined,
-          },
-          create: {
-            email: user.email as string,
-            name: user.name || "No Name",
-            role: "CLIENT", // Always set new users as CLIENT
-          },
         });
 
-        token.id = dbUser.id;
-        token.role = dbUser.role;
+        if (existingUser) {
+          // Existing user — preserve role
+          token.id = existingUser.id;
+          token.role = existingUser.role;
+        } else {
+          // New user — create with default CLIENT role
+          const newUser = await prisma.user.create({
+            data: {
+              email: user.email as string,
+              name: user.name || "No Name",
+              role: "CLIENT",
+            },
+          });
+          token.id = newUser.id;
+          token.role = newUser.role;
+        }
       }
 
+      // Session expiration logic (optional)
       if (token.role === "STAFF" || token.role === "SECRETARY") {
         token.exp = getNextMidnightTimestamp();
       } else {
         const now = Math.floor(Date.now() / 1000);
-        token.exp = now + 60 * 60 * 24 * 30;
+        token.exp = now + 60 * 60 * 24 * 30; // 30 days
       }
 
       return token;

@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import Sidebar from "./admin/Sidebar";
+import Sidebar from "./admin/AdminSidebar";
+import SuperadminSidebar from "./superadmin/SuperadminSidebar";
 import Navbar from "./Navbar";
 
 const roleRoutes: Record<string, string> = {
@@ -48,6 +49,7 @@ export default function LayoutShell({
       <Navbar />
       <div className="flex flex-1 flex-col md:flex-row min-h-0">
         <Sidebar />
+        <SuperadminSidebar />
         <main className="flex-1 p-4 md:p-6 bg-surface overflow-x-hidden">
           {children}
         </main>

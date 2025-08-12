@@ -29,7 +29,7 @@ const navItems = [
   { label: "Settings", icon: Settings, href: "/superadmin/settings" },
 ];
 
-export default function Sidebar() {
+export default function SuperadminSidebar() {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
