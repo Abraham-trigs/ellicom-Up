@@ -1,64 +1,79 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import useJobCardStore from "@/lib/store/JobCardStore";
+import React from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface QuantityModalProps {
   open: boolean;
   onClose: () => void;
+  onSelect: (qty: number) => void; // ✅ Added this
 }
 
-export default function QuantityModal({ open, onClose }: QuantityModalProps) {
-  const setQuantity = useJobCardStore((state) => state.setQuantity);
-  const [inputValue, setInputValue] = useState<string>("");
+const backdropStyle = `
+  fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50
+`;
 
-  useEffect(() => {
-    if (open) setInputValue(""); // Reset input on open
-  }, [open]);
+const modalStyle = `
+  bg-container text-coHead rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-sea
+`;
 
-  const handleSave = () => {
-    const num = parseInt(inputValue);
-    if (!isNaN(num) && num > 0 && num <= 10000) {
-      setQuantity(num);
-      onClose();
-    } else {
-      alert("Please enter a valid quantity (1–10000)");
-    }
-  };
+export default function QuantityModal({
+  open,
+  onClose,
+  onSelect,
+}: QuantityModalProps) {
+  const quantities = [1, 5, 10, 20, 50, 100];
 
-  if (!open) return null;
+  if (typeof window === "undefined") return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-      <div className="bg-container border border-sea rounded-xl p-6 w-80 shadow-lg text-coHead">
-        <div className="text-xl font-bold mb-4 text-center">Enter Quantity</div>
-
-        <input
-          type="number"
-          autoFocus
-          className="w-full px-4 py-2 rounded-md bg-ground text-head text-center text-2xl font-bold outline-none border border-high"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSave()}
-          min={1}
-          max={10000}
-        />
-
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={onClose}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-md"
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className={backdropStyle}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+        >
+          <motion.div
+            className={modalStyle}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            onClick={(e) => e.stopPropagation()}
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-sea hover:bg-neonSea text-ground font-bold px-4 py-2 rounded-md"
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
+            <h2 className="text-xl font-bold mb-4 text-head text-center">
+              Select Quantity
+            </h2>
+
+            <div className="grid grid-cols-3 gap-3">
+              {quantities.map((qty) => (
+                <button
+                  key={qty}
+                  onClick={() => {
+                    onSelect(qty); // ✅ Now recognized
+                    onClose();
+                  }}
+                  className="px-4 py-2 rounded-lg bg-sea text-ground hover:bg-high font-semibold"
+                >
+                  {qty}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={onClose}
+              className="mt-6 w-full bg-ground text-coHead border border-coHead py-2 rounded-xl hover:bg-coHead hover:text-ground"
+            >
+              Cancel
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
   );
 }
