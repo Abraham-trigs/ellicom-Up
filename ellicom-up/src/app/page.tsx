@@ -18,31 +18,31 @@ export default function Home() {
 
   return (
     <>
-      <AuthGuard>
-        <Navbar />
+      {/* <AuthGuard> */}
+      <Navbar />
 
-        {/* Background Video */}
-        {/* <BackgroundVideo
+      {/* Background Video */}
+      {/* <BackgroundVideo
           src="background-video.mp4"
           poster="/Video-fallback-image.jpg"
         /> */}
 
-        <main className="relative z-10 flex-1 min-h-screen p-8 dark:bg-opacity-60 text-sea dark:text-textPrimary transition-colors">
-          {/* 🆕 Clean, reusable Tag & Slider block */}
-          <TagAndSlider />
+      <main className="relative z-10 flex-1 min-h-screen p-8 dark:bg-opacity-60 text-sea dark:text-textPrimary transition-colors">
+        {/* 🆕 Clean, reusable Tag & Slider block */}
+        <TagAndSlider />
 
-          <h1 className="text-4xl font-bold my-6 text-gold dark:text-head">
-            Welcome to Ellicom Hub
-          </h1>
+        <h1 className="text-4xl font-bold my-6 text-gold dark:text-head">
+          Welcome to Ellicom Hub
+        </h1>
 
-          <p className="mb-4 text-sea dark:text-textSecondary">
-            Let’s build it right, one pixel at a time.
-          </p>
+        <p className="mb-4 text-sea dark:text-textSecondary">
+          Let’s build it right, one pixel at a time.
+        </p>
 
-          {/* Other content */}
-          {/* <ImageDisplay images={bannerImages} alt="Ellicom Hub Banner" /> */}
-        </main>
-      </AuthGuard>
+        {/* Other content */}
+        {/* <ImageDisplay images={bannerImages} alt="Ellicom Hub Banner" /> */}
+      </main>
+      {/* </AuthGuard> */}
     </>
   );
 }

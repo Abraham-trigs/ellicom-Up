@@ -1,9 +1,6 @@
-// app/layout.tsx
-"use client";
-
 import "./globals.css";
 import ThemeProviderWrapper from "../components/ThemeProviderWrapper";
-import { SessionProvider } from "next-auth/react";
+import SessionProviderWrapper from "../components/SessionProviderWrapper";
 
 export default function RootLayout({
   children,
@@ -13,9 +10,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <SessionProvider>
-          <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
-        </SessionProvider>
+        <ThemeProviderWrapper>
+          <SessionProviderWrapper>{children}</SessionProviderWrapper>
+        </ThemeProviderWrapper>
       </body>
     </html>
   );
