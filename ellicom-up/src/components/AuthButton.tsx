@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { ChevronDown, UserCircle } from "lucide-react";
 
@@ -33,12 +34,15 @@ export default function AuthButton() {
         aria-expanded={dropdownOpen}
       >
         {user?.image ? (
-          <img
-            src={user.image}
-            alt="User avatar"
-            className="w-8 h-8 rounded-full object-cover"
-            loading="lazy"
-          />
+          <div className="relative w-8 h-8">
+            <Image
+              src={user.image}
+              alt="User avatar"
+              fill
+              className="rounded-full object-cover"
+              sizes="32px"
+            />
+          </div>
         ) : (
           <UserCircle className="w-8 h-8 text-textPrimary dark:text-textPrimary" />
         )}
