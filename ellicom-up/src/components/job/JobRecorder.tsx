@@ -2,6 +2,7 @@
 
 import React from "react";
 import useJobCardStore from "@/lib/store/JobCardStore";
+import { useJobPricingStore } from "@/lib/store/JobPricingStore";
 
 import LargeFormatRecorder from "@/components/job/Recorders/LargeFormatRecorder";
 import PapperPrintingRecorder from "@/components/job/Recorders/PapperPrintingRecorder";
@@ -22,7 +23,6 @@ export default function JobRecorder() {
     editingJobId,
     editedJob,
 
-    // setters for live job
     setJobType,
     setPaperSize,
     setQuantity,
@@ -31,14 +31,24 @@ export default function JobRecorder() {
     setMaterial,
     setFileAttached,
 
-    // editing saved jobs
     startEditJob,
     cancelEditJob,
     saveEditedJob,
     setEditedJobField,
   } = useJobCardStore();
 
-  // Build liveJob object
+  const jobPricingList = useJobPricingStore((state) => state.jobPricingList);
+
+  const findUnitPrice = (type: string | null, variable: string | null) => {
+    if (!type) return 0;
+    const pricing = jobPricingList.find(
+      (p) =>
+        p.jobType === type &&
+        (p.variable === variable || p.variable === null || p.variable === "")
+    );
+    return pricing ? pricing.unitPrice : 0;
+  };
+
   const liveJob = {
     id: "live",
     jobType,
@@ -50,7 +60,6 @@ export default function JobRecorder() {
     material,
   };
 
-  // Build list of jobs: live job + saved jobs
   const jobsToRender = [liveJob, ...savedJobs];
 
   if (jobsToRender.length === 0) {
@@ -61,7 +70,6 @@ export default function JobRecorder() {
     );
   }
 
-  // Helper to render each job, either editable or readonly
   const renderJob = (job: typeof liveJob | typeof editedJob | any) => {
     const isLive = job.id === "live";
     const isEditing = !isLive && editingJobId === job.id;
@@ -119,7 +127,7 @@ export default function JobRecorder() {
             <DesigningRecorder
               {...commonProps}
               variable={currentJob.material || ""}
-              unitPrice={0}
+              unitPrice={findUnitPrice("Designing", currentJob.material)}
             />
           );
         default:
@@ -131,7 +139,6 @@ export default function JobRecorder() {
       <div key={job.id} className="relative border p-4 rounded-lg bg-surface">
         {renderRecorderByType()}
 
-        {/* Show Edit / Save / Cancel buttons for saved jobs */}
         {!isLive && (
           <div className="mt-2 flex justify-end gap-2">
             {!isEditing && (
@@ -169,7 +176,6 @@ export default function JobRecorder() {
   return (
     <div className="mx-2 w-full max-w-md sm:max-w-lg lg:max-w-xl border-2 border-coHead bg-darkSea rounded-2xl p-4 space-y-6">
       {jobsToRender.map((job) => {
-        // Don't show live job if no jobType set
         if (job.id === "live" && !job.jobType) return null;
         return renderJob(job);
       })}

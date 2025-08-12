@@ -2,13 +2,24 @@
 
 import React from "react";
 import useJobCardStore from "@/lib/store/JobCardStore";
-import { useJobPricingStore } from "@/lib/store/JobPricingStore"; // <-- import pricing store
+import { useJobPricingStore } from "@/lib/store/JobPricingStore";
 
 import LargeFormatRecorder from "@/components/job/Recorders/LargeFormatRecorder";
 import PapperPrintingRecorder from "@/components/job/Recorders/PapperPrintingRecorder";
 import ScanningRecorder from "@/components/job/Recorders/ScanningRecorder";
 import PhotocopyRecorder from "@/components/job/Recorders/PhotocopyRecorder";
 import DesigningRecorder from "@/components/job/Recorders/DesigningRecorder";
+
+type Job = {
+  id: string;
+  jobType: string | null;
+  paperSize: string | null;
+  quantity: number | null;
+  colorType: string;
+  sideType: string;
+  fileAttached: boolean;
+  material: string | null;
+};
 
 export default function JobRecorder() {
   const {
@@ -51,7 +62,7 @@ export default function JobRecorder() {
     return pricing ? pricing.unitPrice : 0;
   };
 
-  const liveJob = {
+  const liveJob: Job = {
     id: "live",
     jobType,
     paperSize,
@@ -62,7 +73,7 @@ export default function JobRecorder() {
     material,
   };
 
-  const jobsToRender = [liveJob, ...savedJobs];
+  const jobsToRender: Job[] = [liveJob, ...savedJobs];
 
   if (jobsToRender.length === 0) {
     return (
@@ -72,13 +83,12 @@ export default function JobRecorder() {
     );
   }
 
-  const renderJob = (job: typeof liveJob | typeof editedJob | any) => {
+  const renderJob = (job: Job) => {
     const isLive = job.id === "live";
     const isEditing = !isLive && editingJobId === job.id;
-    const currentJob = isEditing ? editedJob : job;
+    const currentJob = isEditing ? editedJob! : job;
 
     const commonProps = {
-      key: job.id,
       jobType: currentJob.jobType,
       paperSize: currentJob.paperSize,
       quantity: currentJob.quantity,
@@ -156,7 +166,7 @@ export default function JobRecorder() {
                 <button
                   className="bg-gold text-black px-3 py-1 rounded hover:bg-highGold transition"
                   onClick={() => {
-                    saveEditedJob(editedJob!);
+                    if (editedJob) saveEditedJob(editedJob);
                   }}
                 >
                   Save Changes

@@ -71,7 +71,6 @@ export default function JobCard() {
     saveJob(); // saves current job and resets state internally
   };
 
-  // Show recorder immediately on jobType select
   const renderRecorder = () => {
     switch (jobType) {
       case "Photocopy":
@@ -88,6 +87,11 @@ export default function JobCard() {
             jobType={jobType}
             variable={material || ""}
             unitPrice={selectedPricing?.unitPrice || 0}
+            isEditing={true}
+            onChange={{
+              setJobType,
+              setMaterial,
+            }}
           />
         );
       default:

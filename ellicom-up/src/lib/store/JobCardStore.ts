@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 type Job = {
-  id: string; // unique per saved job
+  id: string;
   jobType: string | null;
   paperSize: string | null;
   quantity: number | null;
@@ -23,13 +23,11 @@ type JobCardState = {
 
   savedJobs: Job[];
 
-  // Modal states...
   isMaterialModalOpen: boolean;
   isJobTypeModalOpen: boolean;
   isPaperSizeModalOpen: boolean;
   isQuantityModalOpen: boolean;
 
-  // Modals open/close
   openModal: () => void;
   closeModal: () => void;
   openPaperSizeModal: () => void;
@@ -39,7 +37,6 @@ type JobCardState = {
   openMaterialModal: () => void;
   closeMaterialModal: () => void;
 
-  // Setters
   setJobType: (jobType: string) => void;
   setPaperSize: (size: string) => void;
   setQuantity: (qty: number) => void;
@@ -48,9 +45,17 @@ type JobCardState = {
   setMaterial: (material: string) => void;
   setFileAttached: (attached: boolean) => void;
 
-  // Save current job to savedJobs and reset inputs
   saveJob: () => void;
   resetJob: () => void;
+
+  // For editing jobs
+  editingJobId: string | null;
+  editedJob: Job | null;
+
+  startEditJob: (id: string) => void;
+  cancelEditJob: () => void;
+  saveEditedJob: (job: Job) => void;
+  setEditedJobField: (field: keyof Job, value: any) => void;
 };
 
 const useJobCardStore = create<JobCardState>()(
@@ -81,15 +86,18 @@ const useJobCardStore = create<JobCardState>()(
         openMaterialModal: () => set({ isMaterialModalOpen: true }),
         closeMaterialModal: () => set({ isMaterialModalOpen: false }),
 
-        setJobType: (jobType) => set({ jobType, material: null, isJobTypeModalOpen: false }),
-        setPaperSize: (size) => set({ paperSize: size, isPaperSizeModalOpen: false }),
+        setJobType: (jobType) =>
+          set({ jobType, material: null, isJobTypeModalOpen: false }),
+        setPaperSize: (size) =>
+          set({ paperSize: size, isPaperSizeModalOpen: false }),
         setQuantity: (qty) => set({ quantity: qty, isQuantityModalOpen: false }),
         setColorType: (type) => set({ colorType: type }),
         toggleSideType: () =>
           set((state) => ({
             sideType: state.sideType === "Front" ? "Front & Back" : "Front",
           })),
-        setMaterial: (material) => set({ material, isMaterialModalOpen: false }),
+        setMaterial: (material) =>
+          set({ material, isMaterialModalOpen: false }),
         setFileAttached: (attached) => set({ fileAttached: attached }),
 
         saveJob: () => {
@@ -104,10 +112,10 @@ const useJobCardStore = create<JobCardState>()(
             savedJobs,
           } = get();
 
-          if (!jobType) return; // No jobType, no save
+          if (!jobType) return;
 
           const newJob: Job = {
-            id: crypto.randomUUID(), // unique id for each saved job
+            id: crypto.randomUUID(),
             jobType,
             paperSize,
             quantity,
@@ -138,6 +146,36 @@ const useJobCardStore = create<JobCardState>()(
             isPaperSizeModalOpen: false,
             isQuantityModalOpen: false,
           }),
+
+        editingJobId: null,
+        editedJob: null,
+
+        startEditJob: (id) => {
+          const jobToEdit = get().savedJobs.find((job) => job.id === id) || null;
+          set({ editingJobId: id, editedJob: jobToEdit });
+        },
+
+        cancelEditJob: () => {
+          set({ editingJobId: null, editedJob: null });
+        },
+
+        saveEditedJob: (job) => {
+          const updatedJobs = get().savedJobs.map((j) =>
+            j.id === job.id ? job : j
+          );
+          set({ savedJobs: updatedJobs, editingJobId: null, editedJob: null });
+        },
+
+        setEditedJobField: (field, value) => {
+          const editedJob = get().editedJob;
+          if (!editedJob) return;
+          set({
+            editedJob: {
+              ...editedJob,
+              [field]: value,
+            },
+          });
+        },
       }),
       {
         name: "jobCardStore",
@@ -150,6 +188,8 @@ const useJobCardStore = create<JobCardState>()(
           fileAttached: state.fileAttached,
           material: state.material,
           savedJobs: state.savedJobs,
+          editingJobId: state.editingJobId,
+          editedJob: state.editedJob,
         }),
       }
     )
