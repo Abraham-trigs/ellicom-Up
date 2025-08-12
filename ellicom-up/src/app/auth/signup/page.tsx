@@ -41,7 +41,7 @@ export default function SignupPage() {
       } else {
         setSuccess("Account created successfully! Redirecting...");
         setFormData({ name: "", email: "", phone: "", password: "" });
-        router.push("/app"); // <-- redirect here after success
+        router.push("/"); // <-- redirect here after success
       }
     } catch (err) {
       setError("Network error. Try again.");
