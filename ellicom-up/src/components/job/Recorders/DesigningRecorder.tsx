@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { FC } from "react";
 import useJobCardStore from "@/lib/store/JobCardStore";
 import { useJobPricingStore } from "@/lib/store/JobPricingStore";
 
@@ -8,7 +8,6 @@ import LargeFormatRecorder from "@/components/job/Recorders/LargeFormatRecorder"
 import PapperPrintingRecorder from "@/components/job/Recorders/PapperPrintingRecorder";
 import ScanningRecorder from "@/components/job/Recorders/ScanningRecorder";
 import PhotocopyRecorder from "@/components/job/Recorders/PhotocopyRecorder";
-import DesigningRecorder from "@/components/job/Recorders/DesigningRecorder";
 
 type Job = {
   id: string;
@@ -19,6 +18,69 @@ type Job = {
   sideType: string;
   fileAttached: boolean;
   material: string | null;
+};
+
+type DesigningRecorderProps = {
+  jobType: string | null;
+  paperSize: string | null;
+  quantity: number | null;
+  colorType: string;
+  sideType: string;
+  fileAttached: boolean;
+  material: string | null;
+  isEditing: boolean;
+  onChange: {
+    setJobType: (v: string) => void;
+    setMaterial: (v: string) => void;
+    setPaperSize?: (v: string) => void;
+    setQuantity?: (v: number) => void;
+    setColorType?: (v: string) => void;
+    toggleSideType?: () => void;
+    setFileAttached?: (v: boolean) => void;
+  };
+  variable: string;
+  unitPrice: number;
+};
+
+const DesigningRecorder: FC<DesigningRecorderProps> = ({
+  jobType,
+  paperSize,
+  quantity,
+  colorType,
+  sideType,
+  fileAttached,
+  material,
+  isEditing,
+  onChange,
+  variable,
+  unitPrice,
+}) => {
+  return (
+    <div className="p-4 bg-container rounded-md">
+      <h3 className="text-lg font-semibold mb-2">Designing Job</h3>
+      <p>Job Type: {jobType}</p>
+      <p>Material (variable): {variable}</p>
+      <p>Unit Price: ${unitPrice.toFixed(2)}</p>
+      <p>Quantity: {quantity}</p>
+      <p>Color Type: {colorType}</p>
+      <p>Side Type: {sideType}</p>
+      <p>File Attached: {fileAttached ? "Yes" : "No"}</p>
+
+      {isEditing && (
+        <div className="mt-4 space-y-2">
+          <label>
+            Material:
+            <input
+              type="text"
+              value={material || ""}
+              onChange={(e) => onChange.setMaterial(e.target.value)}
+              className="border rounded px-2 py-1 ml-2"
+            />
+          </label>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default function JobRecorder() {
