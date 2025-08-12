@@ -6,7 +6,7 @@ import { useTheme } from "next-themes";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import { motion, AnimatePresence, easeIn, easeOut } from "framer-motion";
 import clsx from "clsx";
-import AuthButton from "../AuthButton";
+import AuthButton from "../auth/AuthButton";
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);

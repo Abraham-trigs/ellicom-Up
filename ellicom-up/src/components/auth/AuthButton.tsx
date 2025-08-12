@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { ChevronDown, UserCircle } from "lucide-react";
 
 export default function AuthButton() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -14,12 +15,12 @@ export default function AuthButton() {
 
   if (!session) {
     return (
-      <Link
-        href="/login"
+      <button
+        onClick={() => router.push("/auth/login")}
         className="px-4 py-2 rounded bg-gold dark:bg-gold text-head dark:text-head font-semibold hover:bg-highGold dark:hover:bg-highGold transition"
       >
         Login
-      </Link>
+      </button>
     );
   }
 
