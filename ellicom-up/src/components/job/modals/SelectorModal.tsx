@@ -48,11 +48,9 @@ export default function SelectorModal({
   const options = useMemo(() => {
     if (!jobType) return [];
 
-    // Filter entries by jobType
     const filtered = jobPricingList.filter((jp) => jp.jobType === jobType);
 
     if (jobType === "Designing") {
-      // Deduplicate variables (non-empty)
       const seen = new Set<string>();
       return filtered
         .map((jp) => jp.variable)
@@ -66,7 +64,6 @@ export default function SelectorModal({
           search ? v.toLowerCase().includes(search.toLowerCase()) : true
         );
     } else {
-      // Deduplicate materialTypes (non-null)
       const seen = new Set<string>();
       return filtered
         .map((jp) => jp.materialType)
@@ -82,14 +79,12 @@ export default function SelectorModal({
     }
   }, [jobPricingList, jobType, search]);
 
-  // Highlight first option on changes
   useEffect(() => {
     if (open) {
       setHighlightIndex(options.length > 0 ? 0 : -1);
     }
   }, [options, open]);
 
-  // Scroll to highlighted option
   useEffect(() => {
     if (highlightIndex >= 0 && itemRefs.current[highlightIndex]) {
       itemRefs.current[highlightIndex]?.scrollIntoView({
@@ -99,7 +94,6 @@ export default function SelectorModal({
     }
   }, [highlightIndex]);
 
-  // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -172,7 +166,9 @@ export default function SelectorModal({
                 {options.map((option, idx) => (
                   <button
                     key={option}
-                    ref={(el) => (itemRefs.current[idx] = el)}
+                    ref={(el: HTMLButtonElement | null) => {
+                      itemRefs.current[idx] = el;
+                    }}
                     onClick={() => {
                       onSelect(option);
                       onClose();
