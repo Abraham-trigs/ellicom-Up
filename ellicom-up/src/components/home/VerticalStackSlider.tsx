@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 const images = [
   "https://picsum.photos/id/1015/400/600",
@@ -117,7 +118,6 @@ export default function CenteredPeekSlider() {
             width: "90%",
             height: "100%",
             maxHeight: "600px",
-            objectFit: "cover",
           };
 
           if (i === topIndex) {
@@ -147,14 +147,22 @@ export default function CenteredPeekSlider() {
           }
 
           return (
-            <img
+            <div
               key={src}
-              src={src}
-              alt={`Card ${i}`}
-              draggable={false}
-              style={style}
-              className="rounded-xl shadow-none"
-            />
+              style={{
+                ...style,
+                position: "absolute",
+                overflow: "hidden",
+              }}
+            >
+              <Image
+                src={src}
+                alt={`Card ${i}`}
+                fill
+                draggable={false}
+                className="rounded-xl shadow-none object-cover"
+              />
+            </div>
           );
         })}
       </div>
