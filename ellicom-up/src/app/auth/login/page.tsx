@@ -1,39 +1,70 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/home/Navbar";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Basic validation (optional)
-    if (!email || !password) return alert("Please fill in both fields");
+    setError("");
+    if (!email || !password) return setError("Please fill in both fields");
 
-    // Sign in with credentials provider
-    const res = await signIn("credentials", {
-      redirect: true,
-      email,
-      password,
-      callbackUrl: "/",
-    });
+    setLoading(true);
 
-    // You can handle res here if redirect:false, but with redirect:true it'll auto redirect
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (!res.ok) return setError(data.error || "Invalid credentials");
+
+      // Redirect based on role
+      switch (data.role) {
+        case "SUPERADMIN":
+          router.push("/dashboard/superadmin");
+          break;
+        case "ADMIN":
+          router.push("/dashboard/admin");
+          break;
+        case "SECRETARY":
+          router.push("/dashboard/secretary");
+          break;
+        case "STAFF":
+          router.push("/dashboard/staff");
+          break;
+        case "CLIENT":
+        default:
+          router.push("/dashboard/client");
+          break;
+      }
+    } catch (err) {
+      setLoading(false);
+      setError("Network error. Try again.");
+    }
   }
 
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-background dark:bg-background">
-        <div className="bg-surface dark:bg-surface p-8 rounded-lg shadow-md w-full max-w-sm">
-          <h2 className="text-ground dark:text-head text-3xl font-extrabold mb-8 text-center">
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="bg-surface p-8 rounded-lg shadow-md w-full max-w-sm">
+          <h2 className="text-head text-3xl font-extrabold mb-8 text-center">
             Log In to Ellicom Hub
           </h2>
+
+          {error && <p className="mb-4 text-red-600">{error}</p>}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-6">
             <input
@@ -41,7 +72,7 @@ export default function LoginPage() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-border dark:border-border rounded bg-container dark:bg-container text-textPrimary dark:text-textPrimary focus:outline-none focus:ring-2 focus:ring-sea dark:focus:ring-sea transition"
+              className="w-full p-3 border border-border rounded bg-container text-textPrimary focus:outline-none focus:ring-2 focus:ring-sea transition"
               required
             />
             <input
@@ -49,43 +80,26 @@ export default function LoginPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-border dark:border-border rounded bg-container dark:bg-container text-textPrimary dark:text-textPrimary focus:outline-none focus:ring-2 focus:ring-sea dark:focus:ring-sea transition"
+              className="w-full p-3 border border-border rounded bg-container text-textPrimary focus:outline-none focus:ring-2 focus:ring-sea transition"
               required
             />
             <button
               type="submit"
-              className="bg-gold dark:bg-gold text-head dark:text-head font-semibold py-3 rounded hover:bg-highGold dark:hover:bg-highGold transition"
+              disabled={loading}
+              className="bg-gold text-head font-semibold py-3 rounded hover:bg-highGold transition"
             >
-              Log In
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
 
-          <div className="flex flex-col gap-4 mb-6">
-            <button
-              onClick={() => signIn("google")}
-              className="flex items-center justify-center gap-2 border border-border dark:border-border px-4 py-3 rounded hover:bg-ground dark:hover:bg-ground transition text-textPrimary dark:text-textPrimary font-semibold"
-            >
-              <FaGoogle className="w-5 h-5" />
-              Continue with Google
-            </button>
-
-            <button
-              onClick={() => signIn("facebook")}
-              className="flex items-center justify-center gap-2 border border-border dark:border-border px-4 py-3 rounded hover:bg-ground dark:hover:bg-ground transition text-textPrimary dark:text-textPrimary font-semibold"
-            >
-              <FaFacebookF className="w-5 h-5" />
-              Continue with Facebook
-            </button>
-          </div>
-
-          <p className="text-center text-textSecondary dark:text-textSecondary">
+          <p className="text-center text-textSecondary">
             Don’t have an account?{" "}
-            <Link
-              href="/auth/signup"
-              className="text-gold dark:text-gold font-semibold hover:underline"
+            <a
+              href="/signup"
+              className="text-gold font-semibold hover:underline"
             >
               Sign up here
-            </Link>
+            </a>
           </p>
         </div>
       </div>

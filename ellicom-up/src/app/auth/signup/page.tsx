@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/home/Navbar";
-import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -23,9 +22,14 @@ export default function SignupPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccess("");
+
+    if (!formData.name || !formData.email || !formData.password) {
+      return setError("Please fill in all required fields");
+    }
+
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/signup", {
@@ -35,18 +39,20 @@ export default function SignupPage() {
       });
 
       const data = await res.json();
+      setLoading(false);
 
       if (!res.ok) {
         setError(data.error || "Something went wrong");
-      } else {
-        setSuccess("Account created successfully! Redirecting...");
-        setFormData({ name: "", email: "", phone: "", password: "" });
-        router.push("/"); // <-- redirect here after success
+        return;
       }
+
+      setSuccess("Account created successfully! Redirecting to login...");
+      setFormData({ name: "", email: "", phone: "", password: "" });
+
+      setTimeout(() => router.push("/login"), 1000);
     } catch (err) {
-      setError("Network error. Try again.");
-    } finally {
       setLoading(false);
+      setError("Network error. Try again.");
     }
   }
 
@@ -100,16 +106,15 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <div className="flex items-center justify-center gap-4">
-            <button className="flex items-center gap-2 border border-border dark:border-border px-4 py-2 rounded hover:bg-ground dark:hover:bg-ground transition text-textPrimary dark:text-textPrimary">
-              <FaGoogle className="w-5 h-5" />
-              Sign up with Google
-            </button>
-            <button className="flex items-center gap-2 border border-border dark:border-border px-4 py-2 rounded hover:bg-ground dark:hover:bg-ground transition text-textPrimary dark:text-textPrimary">
-              <FaFacebookF className="w-5 h-5" />
-              Sign up with Facebook
-            </button>
-          </div>
+          <p className="text-center text-textSecondary dark:text-textSecondary">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="text-gold dark:text-gold font-semibold hover:underline"
+            >
+              Log in here
+            </a>
+          </p>
         </div>
       </div>
     </>
