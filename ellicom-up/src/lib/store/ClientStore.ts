@@ -1,81 +1,66 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-type Client = {
+interface Client {
   id: string;
   name: string;
   email: string;
-  phone?: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
+  phone: string | null;
+  role: string;
+  createdAt: string;
+}
 
-type ClientStore = {
+interface ClientStore {
   clients: Client[];
   fetchClients: () => Promise<void>;
-  addClient: (client: Omit<Client, 'id'>) => Promise<void>;
-  updateClient: (id: string, client: Partial<Client>) => Promise<void>;
+  addClient: (data: {
+    name: string;
+    email: string;
+    phone?: string;
+    password: string;
+  }) => Promise<void>;
   deleteClient: (id: string) => Promise<void>;
-};
+}
 
 export const useClientStore = create<ClientStore>((set) => ({
   clients: [],
 
   fetchClients: async () => {
     try {
-      const res = await fetch('/api/clients');
-      if (!res.ok) throw new Error('Failed to fetch clients');
+      const res = await fetch("/api/clients");
+      if (!res.ok) throw new Error("Failed to fetch clients");
       const data = await res.json();
       set({ clients: data });
     } catch (err) {
-      console.error('[ClientStore.fetchClients]', err);
+      console.error("[ClientStore.fetchClients]", err);
     }
   },
 
-  addClient: async (client) => {
+  addClient: async (clientData) => {
     try {
-      const res = await fetch('/api/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(client),
+      const res = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clientData),
       });
-      if (!res.ok) throw new Error('Failed to create client');
+
+      if (!res.ok) throw new Error("Failed to create client");
       const newClient = await res.json();
-      set((state) => ({
-        clients: [...state.clients, newClient],
-      }));
+      set((state) => ({ clients: [...state.clients, newClient] }));
     } catch (err) {
-      console.error('[ClientStore.addClient]', err);
-    }
-  },
-
-  updateClient: async (id, client) => {
-    try {
-      const res = await fetch(`/api/clients/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(client),
-      });
-      if (!res.ok) throw new Error('Failed to update client');
-      const updated = await res.json();
-      set((state) => ({
-        clients: state.clients.map((c) => (c.id === id ? updated : c)),
-      }));
-    } catch (err) {
-      console.error('[ClientStore.updateClient]', err);
+      console.error("[ClientStore.addClient] Error:", err);
+      throw err;
     }
   },
 
   deleteClient: async (id) => {
     try {
-      const res = await fetch(`/api/clients/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Failed to delete client');
+      const res = await fetch(`/api/clients/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete client");
       set((state) => ({
         clients: state.clients.filter((c) => c.id !== id),
       }));
     } catch (err) {
-      console.error('[ClientStore.deleteClient]', err);
+      console.error("[ClientStore.deleteClient] Error:", err);
     }
   },
 }));
