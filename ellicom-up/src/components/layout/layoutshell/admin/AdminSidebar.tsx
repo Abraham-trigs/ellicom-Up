@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import {
   LayoutDashboard,
   Briefcase,
@@ -91,7 +92,7 @@ export default function AdminSidebar() {
               {navItems.map(({ label, icon: Icon, href }) => {
                 const isActive = pathname === href;
                 return (
-                  <a
+                  <Link
                     key={label}
                     href={href}
                     onClick={() => setOpen(false)}
@@ -112,7 +113,7 @@ export default function AdminSidebar() {
                         className="ml-auto h-2 w-2 rounded-full bg-gold"
                       />
                     )}
-                  </a>
+                  </Link>
                 );
               })}
             </motion.nav>
@@ -134,7 +135,7 @@ export default function AdminSidebar() {
           {navItems.map(({ label, icon: Icon, href }) => {
             const isActive = pathname === href;
             return (
-              <a
+              <Link
                 key={label}
                 href={href}
                 className={`
@@ -154,7 +155,7 @@ export default function AdminSidebar() {
                     className="ml-auto h-2 w-2 rounded-full bg-gold"
                   />
                 )}
-              </a>
+              </Link>
             );
           })}
         </nav>
