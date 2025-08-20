@@ -1,19 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useSession, signOut } from "next-auth/react";
 import { ChevronDown, UserCircle } from "lucide-react";
 
 export default function AuthButton() {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState<{ name?: string; email: string } | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
 
-  if (status === "loading") return null;
+  // Fetch current user from JWT cookie
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUser();
+  }, []);
 
-  if (!session) {
+  if (loading) return null;
+
+  if (!user) {
     return (
       <button
         onClick={() => router.push("/auth/login")}
@@ -24,8 +46,6 @@ export default function AuthButton() {
     );
   }
 
-  const user = session.user;
-
   return (
     <div className="relative">
       <button
@@ -34,19 +54,7 @@ export default function AuthButton() {
         aria-haspopup="true"
         aria-expanded={dropdownOpen}
       >
-        {user?.image ? (
-          <div className="relative w-8 h-8">
-            <Image
-              src={user.image}
-              alt="User avatar"
-              fill
-              className="rounded-full object-cover"
-              sizes="32px"
-            />
-          </div>
-        ) : (
-          <UserCircle className="w-8 h-8 text-textPrimary dark:text-textPrimary" />
-        )}
+        <UserCircle className="w-8 h-8 text-textPrimary dark:text-textPrimary" />
         <span className="text-textPrimary dark:text-textPrimary font-semibold max-w-[100px] truncate">
           {user?.name || user?.email || "User"}
         </span>
@@ -57,9 +65,11 @@ export default function AuthButton() {
         <ul className="absolute right-0 mt-1 w-40 bg-surface dark:bg-surface border border-border dark:border-border rounded shadow-lg py-1 z-50">
           <li>
             <button
-              onClick={() => {
+              onClick={async () => {
                 setDropdownOpen(false);
-                signOut();
+                await fetch("/api/auth/logout", { method: "POST" });
+                setUser(null);
+                router.push("/auth/login");
               }}
               className="block w-full text-left px-4 py-2 text-textPrimary dark:text-textPrimary hover:bg-ground dark:hover:bg-ground transition"
             >

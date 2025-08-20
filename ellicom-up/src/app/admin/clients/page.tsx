@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useClientStore } from "../../../../lib/store/ClientStore";
+import { useClientStore } from "@/lib/store/ClientStore";
 
 const ROLES = ["CLIENT"] as const;
 

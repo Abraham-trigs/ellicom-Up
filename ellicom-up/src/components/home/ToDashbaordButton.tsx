@@ -1,32 +1,38 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-const roleRoutes: Record<string, string> = {
-  SUPERADMIN: "/superadmin/dashboard",
-  ADMIN: "/admin/dashboard",
-  SECRETARY: "/secretary/dashboard",
-  STAFF: "/staff/dashboard",
-  CLIENT: "/client/dashboard",
-};
+import { useSessionStore } from "@/lib/store/SessionStore";
+import { Button } from "@/components/ui/button";
 
 export default function ToDashboardButton() {
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const { user } = useSessionStore();
 
-  if (status !== "authenticated") return null; // Hide if not logged in
+  // ✅ Match your actual folder structure
+  const roleRoutes: Record<string, string> = {
+    SUPERADMIN: "/superadmin", // app/superadmin/page.tsx
+    ADMIN: "/admin", // app/admin/page.tsx
+    SECRETARY: "/secretary", // app/secretary/page.tsx (create if not yet)
+    STAFF: "/staff", // app/staff/page.tsx (create if not yet)
+    CLIENT: "/client", // app/client/page.tsx (create if not yet)
+  };
 
-  const role = session?.user?.role ?? ""; // default fallback
-  const dashboardRoute = roleRoutes[role] || "/auth/login";
+  const handleRedirect = () => {
+    if (user?.role && roleRoutes[user.role]) {
+      router.push(roleRoutes[user.role]);
+    } else {
+      router.push("/auth/login"); // fallback
+    }
+  };
+
+  if (!user) return null;
 
   return (
-    <button
-      onClick={() => router.push(dashboardRoute)}
-      className="px-4 py-2 bg-gold text-background rounded hover:bg-highGold transition"
-      aria-label="Go to dashboard"
+    <Button
+      onClick={handleRedirect}
+      className="mt-4 rounded-xl px-6 py-2 text-base font-medium"
     >
-      Dashboard
-    </button>
+      Go to Dashboard
+    </Button>
   );
 }

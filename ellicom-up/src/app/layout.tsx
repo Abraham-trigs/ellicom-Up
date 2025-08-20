@@ -1,6 +1,5 @@
 import "./globals.css";
 import ThemeProviderWrapper from "../components/ThemeProviderWrapper";
-import SessionProviderWrapper from "../components/SessionProviderWrapper";
 
 export default function RootLayout({
   children,
@@ -10,9 +9,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProviderWrapper>
-          <SessionProviderWrapper>{children}</SessionProviderWrapper>
-        </ThemeProviderWrapper>
+        <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
       </body>
     </html>
   );

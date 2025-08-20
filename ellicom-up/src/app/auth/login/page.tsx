@@ -30,8 +30,11 @@ export default function LoginPage() {
 
       if (!res.ok) return setError(data.error || "Invalid credentials");
 
+      // ✅ Use the user object returned by API
+      const role = data.user.role;
+
       // Redirect based on role
-      switch (data.role) {
+      switch (role) {
         case "SUPERADMIN":
           router.push("/dashboard/superadmin");
           break;

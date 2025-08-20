@@ -1,5 +1,5 @@
 // lib/prisma/jobPricing.ts
-import { prisma } from "@/lib/prisma/prisma";
+import { prisma } from "@/lib/prisma";
 
 // ✅ CREATE
 export async function createJobPricing(data: {

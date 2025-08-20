@@ -1,9 +1,9 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import { useSessionStore } from "@/lib/store/SessionStore";
 import AdminSidebar from "@/components/layout/layoutshell/admin/AdminSidebar";
 import Navbar from "@/components/layout/Navbar";
 
@@ -12,22 +12,20 @@ export default function LayoutShell({
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const user = useSessionStore((state) => state.user);
+  const isAuthenticated = useSessionStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    if (status === "loading") return; // Wait for session to load
-
-    if (!session) {
-      router.replace("/auth/login"); // redirect if not logged in
+    if (!isAuthenticated()) {
+      router.replace("/auth/login");
     }
-  }, [status, session, router]);
+  }, [isAuthenticated, router]);
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
+  if (!user) {
+    return <div>Loading...</div>; // or redirect spinner
   }
 
-  // No role check — sidebar always shown
   return (
     <div className="min-h-screen bg-background text-textPrimary flex flex-col">
       <Navbar />

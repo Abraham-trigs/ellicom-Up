@@ -1,6 +1,6 @@
 // app/api/team/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma/prisma';
+import { prisma } from '@/lib/prisma';
 import { Role } from '@prisma/client';
 
 const TEAM_ROLES: Role[] = ['ADMIN', 'SECRETARY', 'STAFF'];
