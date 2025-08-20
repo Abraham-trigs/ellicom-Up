@@ -12,7 +12,12 @@ export default function ClientsPage() {
   type Tab = (typeof ROLES)[number] | "addClient";
   const [activeTab, setActiveTab] = useState<Tab>("All");
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+  });
   const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,7 +30,8 @@ export default function ClientsPage() {
   }, [activeTab, clients]);
 
   const handleSubmit = async () => {
-    if (!form.name || !form.email) return alert("Name and Email are required");
+    if (!form.name || !form.password)
+      return alert("Name and Password are required");
 
     if (editingId) {
       await updateClient(editingId, form);
@@ -34,7 +40,7 @@ export default function ClientsPage() {
       await addClient(form);
     }
 
-    setForm({ name: "", email: "", phone: "" });
+    setForm({ name: "", email: "", phone: "", password: "" });
     setActiveTab("All");
   };
 
@@ -44,6 +50,7 @@ export default function ClientsPage() {
       name: client.name,
       email: client.email,
       phone: client.phone || "",
+      password: "", // keep empty so we don’t accidentally expose password
     });
     setActiveTab("addClient");
   };
@@ -62,7 +69,7 @@ export default function ClientsPage() {
                 onClick={() => {
                   setActiveTab(role);
                   setEditingId(null);
-                  setForm({ name: "", email: "", phone: "" });
+                  setForm({ name: "", email: "", phone: "", password: "" });
                 }}
                 className={`pb-2 ${
                   activeTab === role
@@ -81,7 +88,7 @@ export default function ClientsPage() {
               onClick={() => {
                 setActiveTab("addClient");
                 setEditingId(null);
-                setForm({ name: "", email: "", phone: "" });
+                setForm({ name: "", email: "", phone: "", password: "" });
               }}
               className={`pb-2 ${
                 activeTab === "addClient"
@@ -105,7 +112,7 @@ export default function ClientsPage() {
             className="border p-2 w-full"
           />
           <input
-            placeholder="Email"
+            placeholder="Email (optional)"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="border p-2 w-full"
@@ -114,6 +121,13 @@ export default function ClientsPage() {
             placeholder="Phone"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            className="border p-2 w-full"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             className="border p-2 w-full"
           />
           <button
@@ -127,7 +141,7 @@ export default function ClientsPage() {
             <button
               onClick={() => {
                 setEditingId(null);
-                setForm({ name: "", email: "", phone: "" });
+                setForm({ name: "", email: "", phone: "", password: "" });
                 setActiveTab("All");
               }}
               className="ml-4 text-sm text-gray-600 underline"
