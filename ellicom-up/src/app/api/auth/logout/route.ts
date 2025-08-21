@@ -1,16 +1,24 @@
+// app/api/auth/logout/route.ts
 import { NextResponse } from "next/server";
 
+const COOKIE_NAME = "token";
+
 export async function POST() {
-  const res = NextResponse.json({ message: "Logged out successfully" });
+  try {
+    const res = NextResponse.json({ success: true, message: "Logged out successfully" });
 
-  // Clear the cookie
-  res.cookies.set("token", "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 0,
-    path: "/",
-  });
+    // Clear the HttpOnly cookie
+    res.cookies.set(COOKIE_NAME, "", {
+      httpOnly: true,
+      expires: new Date(0), // immediately expires
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
 
-  return res;
+    return res;
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+  }
 }
