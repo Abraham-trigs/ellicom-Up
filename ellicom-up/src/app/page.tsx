@@ -1,8 +1,7 @@
 "use client";
 import Navbar from "@/components/home/Navbar";
-import { AuthGuard } from "@/components/auth/AuthGuard";
 import ImageDisplay from "@/components/home/ImageDisplay";
-// import BackgroundVideo from "@/components/home/background-video";
+import BackgroundVideo from "@/components/home/background-video";
 
 // 🆕 Grouped Tag & Slider import
 import TagAndSlider from "@/components/home/TagAndSlider";
@@ -22,10 +21,10 @@ export default function Home() {
       <Navbar />
 
       {/* Background Video */}
-      {/* <BackgroundVideo
-          src="background-video.mp4"
-          poster="/Video-fallback-image.jpg"
-        /> */}
+      <BackgroundVideo
+        src="background-video.mp4"
+        poster="/Video-fallback-image.jpg"
+      />
 
       <main className="relative z-10 flex-1 min-h-screen p-8 dark:bg-opacity-60 text-sea dark:text-textPrimary transition-colors">
         {/* 🆕 Clean, reusable Tag & Slider block */}
@@ -40,7 +39,7 @@ export default function Home() {
         </p>
 
         {/* Other content */}
-        {/* <ImageDisplay images={bannerImages} alt="Ellicom Hub Banner" /> */}
+        <ImageDisplay images={bannerImages} alt="Ellicom Hub Banner" />
       </main>
       {/* </AuthGuard> */}
     </>

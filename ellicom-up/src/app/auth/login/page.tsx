@@ -36,20 +36,20 @@ export default function LoginPage() {
       // Redirect based on role
       switch (role) {
         case "SUPERADMIN":
-          router.push("/dashboard/superadmin");
+          router.push("/superadmin");
           break;
         case "ADMIN":
-          router.push("/dashboard/admin");
+          router.push("/admin");
           break;
         case "SECRETARY":
-          router.push("/dashboard/secretary");
+          router.push("/secretary");
           break;
         case "STAFF":
-          router.push("/dashboard/staff");
+          router.push("/staff");
           break;
         case "CLIENT":
         default:
-          router.push("/dashboard/client");
+          router.push("/client");
           break;
       }
     } catch (err) {
@@ -61,8 +61,8 @@ export default function LoginPage() {
   return (
     <>
       <Navbar />
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="bg-surface p-8 rounded-lg shadow-md w-full max-w-sm">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg- p-8 rounded-lg shadow-md w-full max-w-sm">
           <h2 className="text-head text-3xl font-extrabold mb-8 text-center">
             Log In to Ellicom Hub
           </h2>
