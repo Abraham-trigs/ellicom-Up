@@ -14,7 +14,6 @@ export interface User {
 interface SessionState {
   user: User | null;
   token: string | null;
-  expiresAt: number | null;
   hydrated: boolean;
   isLoggedIn: boolean;
 
@@ -33,7 +32,6 @@ export const useSessionStore = create<SessionState>()(
     (set, get) => ({
       user: null,
       token: null,
-      expiresAt: null,
       hydrated: false,
       isLoggedIn: false,
 
@@ -79,13 +77,16 @@ export const useSessionStore = create<SessionState>()(
     }),
     {
       name: "ellicom-session",
-      partialize: (state) => ({ user: state.user, token: state.token }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHydrated();
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+      }),
+      onRehydrateStorage: () => () => {
+        const session = useSessionStore.getState();
+        session.setHydrated();
 
-        // Recalculate midnight timeout after hydration
-        const session = state?.getState?.();
-        if (session?.isLoggedIn) {
+        // Recalculate midnight logout if already logged in
+        if (session.isLoggedIn) {
           const now = new Date();
           const nextMidnight = new Date(
             now.getFullYear(),
