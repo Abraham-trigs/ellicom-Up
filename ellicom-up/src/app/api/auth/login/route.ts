@@ -7,11 +7,35 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET!;
 const COOKIE_NAME = "token";
 
+export type UserRole = "GUEST" | "SUPERADMIN" | "ADMIN" | "SECRETARY" | "STAFF" | "CLIENT";
+
 type SafeUser = {
   id: string;
   name: string;
   email: string;
-  role: "GUEST" | "SUPERADMIN" | "ADMIN" | "SECRETARY" | "STAFF" | "CLIENT";
+  role: UserRole;
+};
+
+// Helper: milliseconds until next midnight
+function msUntilMidnight() {
+  const now = new Date();
+  const nextMidnight = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 1,
+    0, 0, 0, 0
+  );
+  return nextMidnight.getTime() - now.getTime();
+}
+
+// Dynamic redirect paths for all roles
+const roleRedirects: Record<UserRole, string> = {
+  GUEST: "/",
+  SUPERADMIN: "/admin/dashboard",
+  ADMIN: "/admin/dashboard",
+  SECRETARY: "/secretary/dashboard",
+  STAFF: "/staff/jobs",
+  CLIENT: "/client/dashboard",
 };
 
 export async function POST(req: Request) {
@@ -23,43 +47,43 @@ export async function POST(req: Request) {
     }
 
     const user = await prisma.user.findUnique({ where: { email } });
-
     if (!user) {
       return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 });
     }
 
     const passwordMatches = await bcrypt.compare(password, user.password);
-
     if (!passwordMatches) {
       return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 });
     }
 
-    // ✅ Generate JWT (expires in 1h)
+    const expiresInMs = msUntilMidnight();
+    const expiresInSec = Math.floor(expiresInMs / 1000);
+
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: expiresInSec }
     );
 
-    // ✅ Construct SafeUser
     const safeUser: SafeUser = {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role as SafeUser["role"],
+      role: user.role as UserRole,
     };
 
-    // ✅ Create response
+    const redirectTo = roleRedirects[user.role];
+
     const res = NextResponse.json({
       success: true,
       user: safeUser,
-      token, // returned for client sessionStore
+      token,
+      redirectTo,
     });
 
-    // ✅ Set HttpOnly cookie
     res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      maxAge: 60 * 60, // 1 hour
+      maxAge: expiresInSec,
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
