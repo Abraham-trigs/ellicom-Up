@@ -1,4 +1,3 @@
-// stores/sessionStore.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -38,7 +37,7 @@ export const useSessionStore = create<SessionState>()(
       login: (user, token) => {
         set({ user, token, isLoggedIn: true });
 
-        // Clear existing timeout if any
+        // Clear any existing timeout
         if (midnightTimeout) clearTimeout(midnightTimeout);
 
         // Calculate milliseconds until next midnight
@@ -51,10 +50,8 @@ export const useSessionStore = create<SessionState>()(
         );
         const msUntilMidnight = nextMidnight.getTime() - now.getTime();
 
-        // Set timeout to logout at midnight
-        midnightTimeout = setTimeout(() => {
-          get().logout();
-        }, msUntilMidnight);
+        // Auto logout at midnight
+        midnightTimeout = setTimeout(() => get().logout(), msUntilMidnight);
       },
 
       logout: () => {
@@ -63,6 +60,9 @@ export const useSessionStore = create<SessionState>()(
           clearTimeout(midnightTimeout);
           midnightTimeout = null;
         }
+
+        // Optional: call backend logout to clear cookies
+        fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(console.error);
       },
 
       isAuthenticated: () => !!get().token,
@@ -85,7 +85,6 @@ export const useSessionStore = create<SessionState>()(
         const session = useSessionStore.getState();
         session.setHydrated();
 
-        // Recalculate midnight logout if already logged in
         if (session.isLoggedIn) {
           const now = new Date();
           const nextMidnight = new Date(

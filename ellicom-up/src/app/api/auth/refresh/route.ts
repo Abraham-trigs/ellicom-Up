@@ -11,14 +11,26 @@ const REFRESH_COOKIE = "refresh_token";
 export async function POST(req: Request) {
   try {
     const refreshToken = req.cookies.get(REFRESH_COOKIE)?.value;
-    if (!refreshToken) return NextResponse.json({ success: false, message: "No refresh token" }, { status: 401 });
 
-    const payload = jwt.verify(refreshToken, REFRESH_SECRET) as { id: string; email: string; role: string };
+    if (!refreshToken) {
+      // No refresh token → tell frontend to logout
+      return NextResponse.json({ success: false, message: "No refresh token", forceLogout: true }, { status: 401 });
+    }
+
+    let payload: { id: string; email: string; role: string };
+    try {
+      payload = jwt.verify(refreshToken, REFRESH_SECRET) as any;
+    } catch (err) {
+      // Invalid or expired refresh token → force logout
+      return NextResponse.json({ success: false, message: "Invalid refresh token", forceLogout: true }, { status: 401 });
+    }
 
     const user = await prisma.user.findUnique({ where: { id: payload.id } });
-    if (!user) return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ success: false, message: "User not found", forceLogout: true }, { status: 404 });
+    }
 
-    // Access token expires at midnight
+    // Calculate milliseconds until next midnight
     const now = new Date();
     const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
     const msUntilMidnight = nextMidnight.getTime() - now.getTime();
@@ -46,6 +58,7 @@ export async function POST(req: Request) {
     return res;
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ success: false, message: "Invalid refresh token" }, { status: 401 });
+    // Any unexpected error → force logout
+    return NextResponse.json({ success: false, message: "Internal server error", forceLogout: true }, { status: 500 });
   }
 }

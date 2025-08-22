@@ -1,16 +1,26 @@
 // app/api/auth/logout/route.ts
 import { NextResponse } from "next/server";
 
-const COOKIE_NAME = "token";
+const ACCESS_COOKIE = "token";
+const REFRESH_COOKIE = "refresh_token";
 
 export async function POST() {
   try {
     const res = NextResponse.json({ success: true, message: "Logged out successfully" });
 
-    // Clear the HttpOnly cookie
-    res.cookies.set(COOKIE_NAME, "", {
+    // Clear access token
+    res.cookies.set(ACCESS_COOKIE, "", {
       httpOnly: true,
-      expires: new Date(0), // immediately expires
+      expires: new Date(0),
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    // Clear refresh token
+    res.cookies.set(REFRESH_COOKIE, "", {
+      httpOnly: true,
+      expires: new Date(0),
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
