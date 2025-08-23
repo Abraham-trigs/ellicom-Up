@@ -1,86 +1,133 @@
 // prisma/seed.ts
-import { PrismaClient, Role, JobStatus } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  try {
+    console.log("🌱 Starting database seeding...");
 
-  const hashedPassword = await bcrypt.hash("password123", 10);
-
-  // --- USERS (20) ---
-  const roles: Role[] = [Role.SUPERADMIN, Role.ADMIN, Role.SECRETARY, Role.STAFF, Role.CLIENT];
-  const users = [];
-
-  for (let i = 0; i < 20; i++) {
-    const user = await prisma.user.create({
-      data: {
-        name: `User ${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        password: hashedPassword,
-        phone: `+23320${String(100000 + i)}`,
-        role: roles[i % roles.length],
+    // --- Seed Users ---
+    const users = [
+      {
+        name: "Super Admin",
+        email: "superadmin@ellicom.com",
+        phone: "+233201234567",
+        role: "SUPERADMIN",
       },
-    });
-    users.push(user);
-  }
-
-  console.log(`✅ ${users.length} users seeded successfully!`);
-
-  // --- JOB PRICING (20) ---
-  const jobTypes = ["Photocopy", "Printing", "Large Format", "Scanning", "Designing"];
-  const materialTypes = ["A4 Paper", "Glossy Paper", "Vinyl", null];
-  const variables = ["Per Page", "Per Sheet", "Per SqFt", "Per Project", "Per Unit"];
-
-  for (let i = 0; i < 20; i++) {
-    await prisma.jobPricing.create({
-      data: {
-        jobType: jobTypes[i % jobTypes.length],
-        materialType: materialTypes[i % materialTypes.length] || null,
-        variable: variables[i % variables.length],
-        unitPrice: Math.floor(Math.random() * 90) + 10,
-        modifiers: ["B&W", "Double-sided", "Full Color"].slice(0, (i % 3) + 1),
-        notes: `Pricing notes ${i + 1}`,
+      {
+        name: "Admin",
+        email: "admin@ellicom.com",
+        phone: "+233209876543",
+        role: "ADMIN",
       },
-    });
-  }
-
-  console.log(`✅ 20 job pricing entries seeded successfully!`);
-
-  // --- JOBS (20) ---
-  const statuses: JobStatus[] = [
-    JobStatus.DRAFT,
-    JobStatus.PENDING,
-    JobStatus.IN_PROGRESS,
-    JobStatus.COMPLETED,
-    JobStatus.CANCELLED,
-  ];
-
-  for (let i = 0; i < 20; i++) {
-    const createdBy = users[i % users.length];
-    const handledBy = users[(i + 1) % users.length];
-
-    await prisma.job.create({
-      data: {
-        title: `Job ${i + 1}`,
-        details: `Details of job ${i + 1}`,
-        type: jobTypes[i % jobTypes.length],
-        status: statuses[i % statuses.length],
-        createdById: createdBy.id,
-        handledById: handledBy.id,
+      {
+        name: "Secretary",
+        email: "secretary@ellicom.com",
+        phone: "+233209111111",
+        role: "SECRETARY",
       },
-    });
-  }
+      {
+        name: "Staff Designer",
+        email: "staff@ellicom.com",
+        phone: "+233209222222",
+        role: "STAFF",
+      },
+      {
+        name: "Client John",
+        email: "client@ellicom.com",
+        phone: "+233209333333",
+        role: "CLIENT",
+      },
+    ];
 
-  console.log(`✅ 20 jobs seeded successfully!`);
+for (const user of users) {
+  await prisma.user.create({
+    data: {
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      phone: user.phone,
+      role: user.role,
+      totalRevenue: user.totalRevenue ?? 0,
+      totalJobs: user.totalJobs ?? 0,
+    },
+  });
 }
 
-main()
-  .catch((e) => {
-    console.error("❌ Seed error: ", e);
+    // --- Seed Jobs ---
+    const jobClient = await prisma.user.findUnique({ where: { email: "client@ellicom.com" } });
+    const jobHandler = await prisma.user.findUnique({ where: { email: "staff@ellicom.com" } });
+
+    if (!jobClient) throw new Error("❌ Cannot seed jobs: Client user not found");
+    if (!jobHandler) throw new Error("❌ Cannot seed jobs: Staff handler not found");
+
+    const jobs = [
+      {
+        title: "Photocopy Project",
+        description: "100-page photocopy job",
+        jobType: "PHOTOCOPY",
+        price: 50,
+        clientId: jobClient.id,
+        handlerId: jobHandler.id,
+      },
+      {
+        title: "Design Project",
+        description: "Logo design",
+        jobType: "DESIGNING",
+        price: 200,
+        clientId: jobClient.id,
+        handlerId: jobHandler.id,
+      },
+    ];
+
+    for (const job of jobs) {
+      if (!job.clientId) throw new Error(`❌ Missing clientId for job: ${job.title}`);
+      if (!job.handlerId) throw new Error(`❌ Missing handlerId for job: ${job.title}`);
+      if (!job.price || job.price <= 0) throw new Error(`❌ Invalid price for job: ${job.title}`);
+
+      try {
+        await prisma.job.create({ data: job });
+      } catch (err: any) {
+        if (err.code === "P2002") {
+          console.error(`❌ Duplicate job field: ${err.meta?.target?.join(", ")}`);
+        } else {
+          console.error(`❌ Failed to create job ${job.title}:`, err.message);
+        }
+      }
+    }
+
+    // --- Seed Pricing (example) ---
+    const pricing = [
+      { jobType: "PHOTOCOPY", basePrice: 0.5, unit: "page" },
+      { jobType: "PRINTING", basePrice: 1, unit: "page" },
+      { jobType: "DESIGNING", basePrice: 100, unit: "project" },
+    ];
+
+    for (const price of pricing) {
+      if (!price.jobType) throw new Error("❌ Missing jobType in pricing");
+      if (!price.basePrice || price.basePrice <= 0) {
+        throw new Error(`❌ Invalid basePrice for pricing: ${price.jobType}`);
+      }
+
+      try {
+        await prisma.jobPricing.create({ data: price });
+      } catch (err: any) {
+        if (err.code === "P2002") {
+          console.error(`❌ Duplicate pricing entry: ${err.meta?.target?.join(", ")}`);
+        } else {
+          console.error(`❌ Failed to create pricing for ${price.jobType}:`, err.message);
+        }
+      }
+    }
+
+    console.log("✅ Database seeding completed.");
+  } catch (error: any) {
+    console.error("❌ Fatal seeding error:", error.message || error);
     process.exit(1);
-  })
-  .finally(async () => {
+  } finally {
     await prisma.$disconnect();
-  });
+  }
+}
+
+main();
