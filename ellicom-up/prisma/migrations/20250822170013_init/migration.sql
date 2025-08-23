@@ -34,18 +34,6 @@ CREATE TABLE "public"."Job" (
 );
 
 -- CreateTable
-CREATE TABLE "public"."Client" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "phone" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Client_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "public"."JobPricing" (
     "id" TEXT NOT NULL,
     "jobType" TEXT NOT NULL,
@@ -64,7 +52,7 @@ CREATE TABLE "public"."JobPricing" (
 CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Client_email_key" ON "public"."Client"("email");
+CREATE UNIQUE INDEX "JobPricing_jobType_materialType_variable_key" ON "public"."JobPricing"("jobType", "materialType", "variable");
 
 -- AddForeignKey
 ALTER TABLE "public"."Job" ADD CONSTRAINT "Job_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

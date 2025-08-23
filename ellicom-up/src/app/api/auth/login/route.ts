@@ -9,7 +9,13 @@ const REFRESH_SECRET = process.env.REFRESH_SECRET!;
 const ACCESS_COOKIE = "token";
 const REFRESH_COOKIE = "refresh_token";
 
-export type UserRole = "GUEST" | "SUPERADMIN" | "ADMIN" | "SECRETARY" | "STAFF" | "CLIENT";
+export type UserRole =
+  | "GUEST"
+  | "SUPERADMIN"
+  | "ADMIN"
+  | "SECRETARY"
+  | "STAFF"
+  | "CLIENT";
 
 type SafeUser = {
   id: string;
@@ -25,7 +31,10 @@ function msUntilMidnight() {
     now.getFullYear(),
     now.getMonth(),
     now.getDate() + 1,
-    0, 0, 0, 0
+    0,
+    0,
+    0,
+    0
   );
   return nextMidnight.getTime() - now.getTime();
 }
@@ -33,42 +42,66 @@ function msUntilMidnight() {
 // Role-based redirects
 const roleRedirects: Record<UserRole, string> = {
   GUEST: "/",
-  SUPERADMIN: "/admin/dashboard",
-  ADMIN: "/admin/dashboard",
-  SECRETARY: "/secretary/dashboard",
-  STAFF: "/staff/jobs",
-  CLIENT: "/client/dashboard",
+  SUPERADMIN: "/admin",
+  ADMIN: "/admin",
+  SECRETARY: "/secretary",
+  STAFF: "/staff",
+  CLIENT: "/client",
 };
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
-    if (!email || !password) return NextResponse.json({ success: false, message: "Email and password required" }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: "Email and password required" },
+        { status: 400 }
+      );
+    }
 
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 });
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "No user found with this email" },
+        { status: 401 }
+      );
+    }
 
     const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) return NextResponse.json({ success: false, message: "Invalid credentials" }, { status: 401 });
+    if (!passwordMatches) {
+      return NextResponse.json(
+        { success: false, message: "Password is incorrect" },
+        { status: 401 }
+      );
+    }
 
     const msUntilMid = msUntilMidnight();
     const accessToken = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: Math.floor(msUntilMid / 1000) }
+      { expiresIn: Math.floor(msUntilMid / 1000) } // seconds until midnight
     );
 
-    // Refresh token valid for 7 days
     const refreshToken = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       REFRESH_SECRET,
       { expiresIn: "7d" }
     );
 
-    const safeUser: SafeUser = { id: user.id, name: user.name, email: user.email, role: user.role };
+    const safeUser: SafeUser = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
     const redirectTo = roleRedirects[user.role];
 
-    const res = NextResponse.json({ success: true, user: safeUser, token: accessToken, redirectTo });
+    const res = NextResponse.json({
+      success: true,
+      user: safeUser,
+      token: accessToken,
+      redirectTo,
+    });
 
     // Set cookies
     res.cookies.set(ACCESS_COOKIE, accessToken, {
@@ -80,7 +113,7 @@ export async function POST(req: Request) {
     });
     res.cookies.set(REFRESH_COOKIE, refreshToken, {
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60,
+      maxAge: 7 * 24 * 60 * 60, // 7 days
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
@@ -88,7 +121,10 @@ export async function POST(req: Request) {
 
     return res;
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+    console.error("Login error:", err);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
