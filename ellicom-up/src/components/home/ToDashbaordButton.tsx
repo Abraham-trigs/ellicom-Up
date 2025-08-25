@@ -30,19 +30,18 @@ export default function ToDashboardButton() {
     <Button
       onClick={handleRedirect}
       className="
-        mt-4 
-        rounded-xl 
-        px-6 py-2 
-        text-base 
-        sm:text-sm 
-        w-full sm:w-auto 
-        bg-gold dark:bg-gold 
-        text-ground dark:text-head 
-        hover:bg-highGold dark:hover:bg-highGold 
-        transition
-      "
+    hidden sm:inline-block 
+    ml-4
+    rounded-xl 
+    px-4 py-2 
+    text-sm sm:text-base 
+    bg-gold dark:bg-gold 
+    text-ground dark:text-head 
+    hover:bg-highGold dark:hover:bg-highGold 
+    transition
+  "
     >
-      Go to Dashboard
+      Dashboard
     </Button>
   );
 }

@@ -12,11 +12,10 @@ import ToDashboardButton from "./ToDashbaordButton";
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { theme, setTheme } = useTheme();
 
   useEffect(() => setMounted(true), []);
-
-  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
@@ -24,9 +23,9 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Features", href: "/features" },
-    { name: "Pricing", href: "/pricing" },
+    // { name: "Home", href: "/" },
+    // { name: "Features", href: "/features" },
+    // { name: "Pricing", href: "/pricing" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ];
@@ -62,9 +61,10 @@ export default function Navbar() {
         scrolled ? "shadow-md shadow-black/40" : "shadow-none"
       )}
     >
-      <div className="max-w-7xl mx-auto px-5 py-3 flex flex-wrap items-center justify-between">
-        {/* Left - Logo */}
-        <div className="flex-1">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between relative">
+        {/* === Mobile / Small Screen Container === */}
+        <div className="flex items-center w-full justify-between md:hidden">
+          {/* Logo */}
           <Link
             href="/"
             className="text-gold dark:text-highGold font-extrabold text-xl select-none hover:text-high dark:hover:text-highGold transition-colors"
@@ -72,33 +72,14 @@ export default function Navbar() {
           >
             Ellicom Hub
           </Link>
-        </div>
 
-        {/* Center - Auth & Dashboard Buttons */}
-        <div className="flex-1 flex justify-center md:justify-end flex-wrap gap-2 mt-2 md:mt-0">
-          <AuthButton />
-          <ToDashboardButton />
-        </div>
+          {/* Dashboard button centered */}
+          <div className="flex-1 flex justify-center">
+            <ToDashboardButton />
+          </div>
 
-        {/* Right - Nav Links + Controls */}
-        <div className="flex-1 flex justify-end items-center gap-4">
-          {/* Desktop Nav */}
-          <ul className="hidden md:flex gap-8 text-head dark:text-textPrimary font-semibold">
-            {navLinks.map(({ name, href }) => (
-              <li key={name}>
-                <Link
-                  href={href}
-                  className="hover:text-gold dark:hover:text-highGold transition-colors duration-200"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* Controls: Dark mode toggle + Hamburger */}
-          <div className="flex items-center gap-4">
+          {/* Hamburger + Dark Mode Toggle */}
+          <div className="flex items-center gap-2">
             {mounted && (
               <button
                 aria-label="Toggle Dark Mode"
@@ -112,11 +93,10 @@ export default function Navbar() {
                 )}
               </button>
             )}
-
             <button
               aria-label="Toggle Menu"
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-md hover:bg-hover transition"
+              className="p-2 rounded-md hover:bg-hover transition"
             >
               {isOpen ? (
                 <X className="text-head dark:text-textPrimary" size={24} />
@@ -126,12 +106,47 @@ export default function Navbar() {
             </button>
           </div>
         </div>
+
+        {/* === Desktop / md and above === */}
+        <div className="hidden md:flex items-center justify-between w-full relative">
+          {/* Logo left */}
+          <Link
+            href="/"
+            className="text-gold dark:text-highGold font-extrabold text-xl select-none hover:text-high dark:hover:text-highGold transition-colors"
+          >
+            Ellicom Hub
+          </Link>
+
+          {/* Centered AuthButton */}
+          <div className="flex items-center justify-center absolute left-1/2 -translate-x-1/2">
+            <AuthButton />
+          </div>
+
+          {/* Right: Nav Links + Dashboard button */}
+          <div className="flex items-center gap-4">
+            <ul className="flex gap-8 text-head dark:text-textPrimary font-semibold">
+              {navLinks.map(({ name, href }) => (
+                <li key={name}>
+                  <Link
+                    href={href}
+                    className="hover:text-gold dark:hover:text-highGold transition-colors duration-200"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-center gap-2">
+              <ToDashboardButton />
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Mobile menu with staggered fade & slide */}
+      {/* === Mobile Menu === */}
       <AnimatePresence>
         {isOpen && (
-          <motion.ul
+          <motion.div
             variants={mobileMenuVariants}
             initial="hidden"
             animate="visible"
@@ -139,7 +154,7 @@ export default function Navbar() {
             className="md:hidden bg-container dark:bg-surface flex flex-col gap-4 px-5 py-4 text-head dark:text-textPrimary font-semibold overflow-hidden"
           >
             {navLinks.map(({ name, href }) => (
-              <motion.li key={name} variants={itemVariants}>
+              <motion.div key={name} variants={itemVariants}>
                 <Link
                   href={href}
                   onClick={() => setIsOpen(false)}
@@ -147,9 +162,14 @@ export default function Navbar() {
                 >
                   {name}
                 </Link>
-              </motion.li>
+              </motion.div>
             ))}
-          </motion.ul>
+
+            {/* AuthButton inside mobile menu */}
+            <div className="flex flex-col gap-2 pt-2">
+              <AuthButton />
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </nav>
