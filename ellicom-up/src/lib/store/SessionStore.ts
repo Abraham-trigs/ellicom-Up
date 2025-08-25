@@ -1,7 +1,14 @@
+// stores/session.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type UserRole = "GUEST" | "SUPERADMIN" | "ADMIN" | "SECRETARY" | "STAFF" | "CLIENT";
+export type UserRole =
+  | "GUEST"
+  | "SUPERADMIN"
+  | "ADMIN"
+  | "SECRETARY"
+  | "STAFF"
+  | "CLIENT";
 
 export interface User {
   id: string;
@@ -16,9 +23,9 @@ interface SessionState {
   hydrated: boolean;
   isLoggedIn: boolean;
 
-  login: (user: User, token: string) => void;
+  login: (user: User, token: string, expiresAt: string) => void;
   logout: () => void;
-
+  fetchSession: () => Promise<void>;
   isAuthenticated: () => boolean;
   hasRole: (roles: UserRole | UserRole[]) => boolean;
   setHydrated: () => void;
@@ -34,24 +41,19 @@ export const useSessionStore = create<SessionState>()(
       hydrated: false,
       isLoggedIn: false,
 
-      login: (user, token) => {
+      login: (user, token, expiresAt) => {
         set({ user, token, isLoggedIn: true });
 
-        // Clear any existing timeout
+        // Clear previous timer
         if (midnightTimeout) clearTimeout(midnightTimeout);
 
-        // Calculate milliseconds until next midnight
+        // Calculate milliseconds until expiration (from backend)
         const now = new Date();
-        const nextMidnight = new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate() + 1,
-          0, 0, 0, 0
-        );
-        const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+        const expiryDate = expiresAt ? new Date(expiresAt) : new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+        const msUntilExpiry = expiryDate.getTime() - now.getTime();
 
-        // Auto logout at midnight
-        midnightTimeout = setTimeout(() => get().logout(), msUntilMidnight);
+        // Auto logout at expiry
+        midnightTimeout = setTimeout(() => get().logout(), msUntilExpiry);
       },
 
       logout: () => {
@@ -61,8 +63,26 @@ export const useSessionStore = create<SessionState>()(
           midnightTimeout = null;
         }
 
-        // Optional: call backend logout to clear cookies
+        // Optional: clear server cookie
         fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(console.error);
+      },
+
+      fetchSession: async () => {
+        try {
+          const res = await fetch("/api/auth/me", { method: "GET", credentials: "include" });
+          const data = await res.json();
+
+          if (res.ok && data.success && data.user) {
+            get().login(data.user, data.token, data.expiresAt);
+          } else {
+            get().logout();
+          }
+        } catch (err) {
+          console.error("Failed to fetch session:", err);
+          get().logout();
+        } finally {
+          get().setHydrated();
+        }
       },
 
       isAuthenticated: () => !!get().token,
@@ -77,25 +97,10 @@ export const useSessionStore = create<SessionState>()(
     }),
     {
       name: "ellicom-session",
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-      }),
+      partialize: (state) => ({ user: state.user, token: state.token }),
       onRehydrateStorage: () => () => {
         const session = useSessionStore.getState();
         session.setHydrated();
-
-        if (session.isLoggedIn) {
-          const now = new Date();
-          const nextMidnight = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate() + 1,
-            0, 0, 0, 0
-          );
-          const msUntilMidnight = nextMidnight.getTime() - now.getTime();
-          midnightTimeout = setTimeout(() => session.logout(), msUntilMidnight);
-        }
       },
     }
   )

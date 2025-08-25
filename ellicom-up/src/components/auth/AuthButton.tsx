@@ -2,40 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { ChevronDown, UserCircle } from "lucide-react";
+import { useSessionStore } from "@/lib/store/SessionStore";
 
 export default function AuthButton() {
   const router = useRouter();
+  const { user, fetchSession, logout, isAuthenticated } = useSessionStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [user, setUser] = useState<{ name?: string; email: string } | null>(
-    null
-  );
   const [loading, setLoading] = useState(true);
 
-  // Fetch current user from JWT cookie
+  // Fetch session from store on mount
   useEffect(() => {
-    async function fetchUser() {
-      try {
-        const res = await fetch("/api/auth/me");
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } catch {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchUser();
-  }, []);
+    const init = async () => {
+      await fetchSession();
+      setLoading(false);
+    };
+    init();
+  }, [fetchSession]);
 
   if (loading) return null;
 
-  if (!user) {
+  if (!isAuthenticated() || !user) {
     return (
       <button
         onClick={() => router.push("/auth/login")}
@@ -56,7 +43,7 @@ export default function AuthButton() {
       >
         <UserCircle className="w-8 h-8 text-textPrimary dark:text-textPrimary" />
         <span className="text-textPrimary dark:text-textPrimary font-semibold max-w-[100px] truncate">
-          {user?.name || user?.email || "User"}
+          {user.name || user.email}
         </span>
         <ChevronDown className="w-4 h-4 text-textPrimary dark:text-textPrimary" />
       </button>
@@ -67,8 +54,7 @@ export default function AuthButton() {
             <button
               onClick={async () => {
                 setDropdownOpen(false);
-                await fetch("/api/auth/logout", { method: "POST" });
-                setUser(null);
+                await logout(); // Zustand logout handles cookies + store
                 router.push("/auth/login");
               }}
               className="block w-full text-left px-4 py-2 text-textPrimary dark:text-textPrimary hover:bg-ground dark:hover:bg-ground transition"

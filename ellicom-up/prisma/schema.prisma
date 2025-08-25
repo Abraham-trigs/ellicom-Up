@@ -1,5 +1,3 @@
-// schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,45 +7,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String?
+  phone       String?
+  role        Role
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdJobs Job[]    @relation("JobsCreated")
+  handledJobs Job[]    @relation("JobsHandled")
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  title       String
+  details     String?
+  status      JobStatus @default(DRAFT)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  createdById String
+  handledById String?
+  jobPricingId String?   // 🔑 link to JobPricing
+
+  createdBy   User      @relation("JobsCreated", fields: [createdById], references: [id])
+  handledBy   User?     @relation("JobsHandled", fields: [handledById], references: [id])
+  jobPricing  JobPricing? @relation(fields: [jobPricingId], references: [id])
+}
+
+model JobPricing {
+  id           String   @id @default(cuid())
+  jobType      String
+  materialType String?
+  variable     String
+  unitPrice    Float
+  modifiers    String[]
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  jobs         Job[]    // 👈 reverse relation
+}
+
+enum JobStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 enum Role {
   SUPERADMIN
   ADMIN
   SECRETARY
   STAFF
   CLIENT
-  GUEST
 }
 
-model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  password     String
-  phone        String   @unique 
-  role         Role     @default(GUEST)
-  totalRevenue Float    @default(0)
-  totalJobs    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  createdJobs Job[] @relation("JobsCreated")
-  handledJobs Job[] @relation("JobsHandled")
-}
-
-model Job {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  type        String   // e.g. Printing, Scanning, Designing
-  price       Float
-  status      String   @default("PENDING")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  clientId String
-  client   User @relation("JobsCreated", fields: [clientId], references: [id])
-
-  handlerId String?
-  handler   User? @relation("JobsHandled", fields: [handlerId], references: [id])
-}

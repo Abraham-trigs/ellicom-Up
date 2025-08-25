@@ -1,119 +1,62 @@
 // app/api/auth/login/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const REFRESH_SECRET = process.env.REFRESH_SECRET!;
-const ACCESS_COOKIE = "token";
-const REFRESH_COOKIE = "refresh_token";
-
-export type UserRole =
-  | "GUEST"
-  | "SUPERADMIN"
-  | "ADMIN"
-  | "SECRETARY"
-  | "STAFF"
-  | "CLIENT";
-
-type SafeUser = {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-};
-
-// milliseconds until next midnight
-function msUntilMidnight() {
-  const now = new Date();
-  const nextMidnight = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + 1,
-    0,
-    0,
-    0,
-    0
-  );
-  return nextMidnight.getTime() - now.getTime();
-}
-
-// Role-based redirects
-const roleRedirects: Record<UserRole, string> = {
-  GUEST: "/",
-  SUPERADMIN: "/admin",
-  ADMIN: "/admin",
-  SECRETARY: "/secretary",
-  STAFF: "/staff",
-  CLIENT: "/client",
-};
+const COOKIE_NAME = "token";
 
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
     if (!email || !password) {
       return NextResponse.json(
-        { success: false, message: "Email and password required" },
+        { error: "Email and password required" },
         { status: 400 }
       );
     }
 
+    // 1️⃣ Find user
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json(
-        { success: false, message: "No user found with this email" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) {
-      return NextResponse.json(
-        { success: false, message: "Password is incorrect" },
-        { status: 401 }
-      );
+    // 2️⃣ Verify password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const msUntilMid = msUntilMidnight();
-    const accessToken = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+    // 3️⃣ Calculate milliseconds until next midnight
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      0, 0, 0, 0
+    );
+    const expiresInSeconds = Math.floor((nextMidnight.getTime() - now.getTime()) / 1000);
+
+    // 4️⃣ Sign JWT that expires at midnight
+    const token = jwt.sign(
+      { id: user.id, role: user.role, email: user.email },
       JWT_SECRET,
-      { expiresIn: Math.floor(msUntilMid / 1000) } // seconds until midnight
+      { expiresIn: expiresInSeconds }
     );
 
-    const refreshToken = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      REFRESH_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    const safeUser: SafeUser = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
-    const redirectTo = roleRedirects[user.role];
-
+    // 5️⃣ Set cookie (HttpOnly) to match JWT expiration
     const res = NextResponse.json({
-      success: true,
-      user: safeUser,
-      token: accessToken,
-      redirectTo,
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      expiresAt: nextMidnight.toISOString(),
     });
 
-    // Set cookies
-    res.cookies.set(ACCESS_COOKIE, accessToken, {
+    res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
-      maxAge: Math.floor(msUntilMid / 1000),
-      path: "/",
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    });
-    res.cookies.set(REFRESH_COOKIE, refreshToken, {
-      httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: expiresInSeconds,
       path: "/",
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
@@ -122,9 +65,6 @@ export async function POST(req: Request) {
     return res;
   } catch (err) {
     console.error("Login error:", err);
-    return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }

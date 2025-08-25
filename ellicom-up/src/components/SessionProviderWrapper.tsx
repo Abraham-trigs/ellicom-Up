@@ -12,26 +12,35 @@ export default function SessionProviderWrapper({
   children,
 }: SessionProviderWrapperProps) {
   const [hydrated, setHydrated] = useState(false);
+  const { fetchSession, logout } = useSessionStore();
 
-  // ensure Zustand rehydration before rendering
   useEffect(() => {
     setHydrated(true);
-  }, []);
 
-  // optional: you can also access session store here
-  const { user, token, isAuthenticated } = useSessionStore();
+    // 1️⃣ Fetch current session on mount
+    fetchSession().catch(console.error);
 
-  if (!hydrated) {
-    // prevents hydration mismatch between SSR & client
-    return null;
-  }
+    // 2️⃣ Auto-logout at next midnight
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      0,
+      0,
+      0,
+      0
+    );
+    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
 
-  return <SessionContext>{children}</SessionContext>;
-}
+    const timeout = setTimeout(() => {
+      logout();
+    }, msUntilMidnight);
 
-// optional context-like component
-function SessionContext({ children }: { children: ReactNode }) {
-  const session = useSessionStore();
+    return () => clearTimeout(timeout);
+  }, [fetchSession, logout]);
+
+  if (!hydrated) return null; // Prevent SSR/CSR hydration mismatch
 
   return <>{children}</>;
 }

@@ -62,7 +62,7 @@ export default function Navbar() {
         scrolled ? "shadow-md shadow-black/40" : "shadow-none"
       )}
     >
-      <div className="max-w-7xl mx-auto px-5 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-5 py-3 flex flex-wrap items-center justify-between">
         {/* Left - Logo */}
         <div className="flex-1">
           <Link
@@ -74,11 +74,11 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Center - Auth Button */}
-        <div className="flex-1 flex justify-center">
+        {/* Center - Auth & Dashboard Buttons */}
+        <div className="flex-1 flex justify-center md:justify-end flex-wrap gap-2 mt-2 md:mt-0">
           <AuthButton />
+          <ToDashboardButton />
         </div>
-        <ToDashboardButton />
 
         {/* Right - Nav Links + Controls */}
         <div className="flex-1 flex justify-end items-center gap-4">
