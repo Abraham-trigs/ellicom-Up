@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useJobPricingStore } from "@/lib/store/JobPricingStore";
+import { useJobStore } from "@/lib/store/JobStore";
 
 interface SelectorModalProps {
   open: boolean;
@@ -26,8 +26,7 @@ export default function SelectorModal({
   onSelect,
   jobType,
 }: SelectorModalProps) {
-  const { jobPricingList, fetchJobPricing, isLoading, error } =
-    useJobPricingStore();
+  const { jobPricings, fetchJobPricings, loading, error } = useJobStore();
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -36,30 +35,25 @@ export default function SelectorModal({
   // Fetch data on open
   useEffect(() => {
     if (open) {
-      fetchJobPricing();
+      fetchJobPricings();
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
       setSearch("");
       setHighlightIndex(-1);
     }
-  }, [open, fetchJobPricing]);
+  }, [open, fetchJobPricings]);
 
   // Select either materialType or variable depending on jobType
   const options = useMemo(() => {
     if (!jobType) return [];
 
-    const filtered = jobPricingList.filter((jp) => jp.jobType === jobType);
+    const filtered = jobPricings.filter((jp) => jp.jobType === jobType);
 
     if (jobType === "Designing") {
       const seen = new Set<string>();
       return filtered
         .map((jp) => jp.variable)
-        .filter((v) => {
-          if (!v) return false;
-          if (seen.has(v)) return false;
-          seen.add(v);
-          return true;
-        })
+        .filter((v) => v && !seen.has(v) && seen.add(v))
         .filter((v) =>
           search ? v.toLowerCase().includes(search.toLowerCase()) : true
         );
@@ -68,16 +62,12 @@ export default function SelectorModal({
       return filtered
         .map((jp) => jp.materialType)
         .filter((mat): mat is string => !!mat)
-        .filter((mat) => {
-          if (seen.has(mat)) return false;
-          seen.add(mat);
-          return true;
-        })
+        .filter((mat) => !seen.has(mat) && seen.add(mat))
         .filter((mat) =>
           search ? mat.toLowerCase().includes(search.toLowerCase()) : true
         );
     }
-  }, [jobPricingList, jobType, search]);
+  }, [jobPricings, jobType, search]);
 
   useEffect(() => {
     if (open) {
@@ -151,7 +141,7 @@ export default function SelectorModal({
               className="w-full mb-4 px-3 py-2 border border-sea rounded-lg outline-none focus:ring-2 focus:ring-sea"
             />
 
-            {isLoading && (
+            {loading && (
               <div className="text-center text-sm text-gray-400">
                 Loading...
               </div>
@@ -161,7 +151,7 @@ export default function SelectorModal({
               <div className="text-center text-sm text-red-400">{error}</div>
             )}
 
-            {!isLoading && !error && (
+            {!loading && !error && (
               <div className="max-h-60 overflow-y-auto space-y-2">
                 {options.map((option, idx) => (
                   <button

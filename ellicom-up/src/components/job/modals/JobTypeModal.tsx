@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useJobPricingStore } from "@/lib/store/JobPricingStore";
+import { useJobStore } from "@/lib/store/JobStore";
 
 interface JobTypeModalProps {
   open: boolean;
@@ -24,8 +24,7 @@ export default function JobTypeModal({
   onClose,
   onSelect,
 }: JobTypeModalProps) {
-  const { jobPricingList, fetchJobPricing, isLoading, error } =
-    useJobPricingStore();
+  const { jobPricings, fetchJobPricings, loading, error } = useJobStore();
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
 
@@ -35,7 +34,7 @@ export default function JobTypeModal({
   // Deduplicate job types
   const uniqueJobTypes = useMemo(() => {
     const seen = new Set<string>();
-    return jobPricingList
+    return jobPricings
       .map((item) => item.jobType)
       .filter((type) => {
         if (seen.has(type)) return false;
@@ -43,7 +42,7 @@ export default function JobTypeModal({
         return true;
       })
       .sort();
-  }, [jobPricingList]);
+  }, [jobPricings]);
 
   // Filter based on search
   const filteredJobTypes = useMemo(() => {
@@ -55,13 +54,13 @@ export default function JobTypeModal({
   // Auto-focus search bar when modal opens and fetch data
   useEffect(() => {
     if (open) {
-      fetchJobPricing();
+      fetchJobPricings();
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
       setSearch("");
       setHighlightIndex(-1);
     }
-  }, [open, fetchJobPricing]);
+  }, [open, fetchJobPricings]);
 
   // Highlight first filtered item on filteredJobTypes or open change
   useEffect(() => {
@@ -134,15 +133,13 @@ export default function JobTypeModal({
               ref={inputRef}
               type="text"
               value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-              }}
+              onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Search job types..."
               className="w-full mb-4 px-3 py-2 border border-sea rounded-lg outline-none focus:ring-2 focus:ring-sea"
             />
 
-            {isLoading && (
+            {loading && (
               <div className="text-center text-sm text-gray-400">
                 Loading...
               </div>
@@ -152,25 +149,21 @@ export default function JobTypeModal({
               <div className="text-center text-sm text-red-400">{error}</div>
             )}
 
-            {!isLoading && !error && (
+            {!loading && !error && (
               <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
                 {filteredJobTypes.map((type, index) => (
                   <button
-                    ref={(el) => {
-                      itemRefs.current[index] = el;
-                    }}
+                    ref={(el) => (itemRefs.current[index] = el)}
                     key={type}
                     onClick={() => {
                       onSelect(type);
                       onClose();
                     }}
-                    className={`font-bold py-2 px-4 rounded-xl transition
-                      ${
-                        index === highlightIndex
-                          ? "bg-high text-ground ring-2 ring-gold"
-                          : "bg-sea text-ground hover:bg-high"
-                      }
-                    `}
+                    className={`font-bold py-2 px-4 rounded-xl transition ${
+                      index === highlightIndex
+                        ? "bg-high text-ground ring-2 ring-gold"
+                        : "bg-sea text-ground hover:bg-high"
+                    }`}
                   >
                     {type}
                   </button>

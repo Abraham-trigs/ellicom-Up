@@ -47,6 +47,7 @@ export interface JobWithUsers extends Job {
 interface JobStore {
   jobs: JobWithUsers[];
   jobPricings: JobPricing[];
+  currentJob?: JobWithUsers;
   loading: boolean;
   error?: string;
 
@@ -61,6 +62,10 @@ interface JobStore {
   createJobPricing: (pricing: Partial<JobPricing>) => Promise<void>;
   updateJobPricing: (id: string, pricing: Partial<JobPricing>) => Promise<void>;
   deleteJobPricing: (id: string) => Promise<void>;
+
+  // Current job actions
+  setCurrentJob: (job: JobWithUsers) => void;
+  saveJob: (job: JobWithUsers) => Promise<void>;
 }
 
 export const useJobStore = create<JobStore>()(
@@ -68,6 +73,7 @@ export const useJobStore = create<JobStore>()(
     (set, get) => ({
       jobs: [],
       jobPricings: [],
+      currentJob: undefined,
       loading: false,
       error: undefined,
 
@@ -164,7 +170,9 @@ export const useJobStore = create<JobStore>()(
           if (!res.ok) throw new Error("Failed to update job pricing");
           const updated: JobPricing = await res.json();
           set({
-            jobPricings: get().jobPricings.map((p) => (p.id === id ? updated : p)),
+            jobPricings: get().jobPricings.map((p) =>
+              p.id === id ? updated : p
+            ),
           });
         } catch (err: any) {
           set({ error: err.message });
@@ -173,11 +181,24 @@ export const useJobStore = create<JobStore>()(
 
       deleteJobPricing: async (id) => {
         try {
-          const res = await fetch(`/api/jobpricing/${id}`, { method: "DELETE" });
+          const res = await fetch(`/api/jobpricing/${id}`, {
+            method: "DELETE",
+          });
           if (!res.ok) throw new Error("Failed to delete job pricing");
           set({ jobPricings: get().jobPricings.filter((p) => p.id !== id) });
         } catch (err: any) {
           set({ error: err.message });
+        }
+      },
+
+      // ===== CURRENT JOB =====
+      setCurrentJob: (job) => set({ currentJob: job }),
+
+      saveJob: async (job) => {
+        if (job.id === "live") {
+          await get().createJob(job);
+        } else {
+          await get().updateJob(job.id, job);
         }
       },
     }),

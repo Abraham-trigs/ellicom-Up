@@ -2,7 +2,7 @@
 
 import React from "react";
 import useJobCardStore from "@/lib/store/JobCardStore";
-import { useJobPricingStore } from "@/lib/store/JobPricingStore";
+import { useJobStore } from "@/lib/store/JobStore";
 
 import LargeFormatRecorder from "@/components/job/Recorders/LargeFormatRecorder";
 import PapperPrintingRecorder from "@/components/job/Recorders/PapperPrintingRecorder";
@@ -37,11 +37,11 @@ export default function JobRecorder() {
     setEditedJobField,
   } = useJobCardStore();
 
-  const jobPricingList = useJobPricingStore((state) => state.jobPricingList);
+  const { jobPricings } = useJobStore();
 
   const findUnitPrice = (type: string | null, variable: string | null) => {
     if (!type) return 0;
-    const pricing = jobPricingList.find(
+    const pricing = jobPricings.find(
       (p) =>
         p.jobType === type &&
         (p.variable === variable || p.variable === null || p.variable === "")
