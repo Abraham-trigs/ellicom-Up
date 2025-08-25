@@ -9,8 +9,8 @@ export interface User {
   email: string;
   phone?: string | null;
   role: UserRole | string; // string because API might return other roles
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string; // optional if not returned by API
+  updatedAt?: string; // optional if not returned by API
 }
 
 interface StaffStoreState {
@@ -27,17 +27,11 @@ export const useStaffStore = create<StaffStoreState>((set) => ({
   fetchStaffUsers: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('/api/users');
+      const res = await fetch('/api/team'); // <-- updated to your API
       if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
 
-      const allUsers: User[] = await res.json();
-
-      // Filter only ADMIN, SECRETARY, STAFF roles
-      const filteredUsers = allUsers.filter(user =>
-        ['ADMIN', 'SECRETARY', 'STAFF'].includes(user.role)
-      );
-
-      set({ users: filteredUsers, loading: false });
+      const users: User[] = await res.json();
+      set({ users, loading: false });
     } catch (err: any) {
       set({ error: err.message || 'Unknown error', loading: false });
     }

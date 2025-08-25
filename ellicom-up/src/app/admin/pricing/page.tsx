@@ -1,22 +1,21 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useJobPricingStore } from "@/lib/store/JobPricingStore";
+import { useJobStore, JobPricing } from "@/lib/store/JobStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { JobPricing } from "@prisma/client";
 
 export default function PricingPage() {
   const {
-    jobPricingList,
-    fetchJobPricing,
-    addJobPricing,
+    jobPricings,
+    fetchJobPricings,
+    createJobPricing,
     updateJobPricing,
     deleteJobPricing,
-  } = useJobPricingStore();
+  } = useJobStore();
 
   const [filterJobType, setFilterJobType] = useState("All");
   const [formData, setFormData] = useState<
@@ -34,14 +33,14 @@ export default function PricingPage() {
   const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
-    fetchJobPricing();
-  }, [fetchJobPricing]);
+    fetchJobPricings();
+  }, [fetchJobPricings]);
 
   const filteredList = useMemo(() => {
-    return jobPricingList.filter((item) =>
+    return jobPricings.filter((item) =>
       filterJobType === "All" ? true : item.jobType === filterJobType
     );
-  }, [jobPricingList, filterJobType]);
+  }, [jobPricings, filterJobType]);
 
   const toggleTab = (tabName: string) => {
     setActiveTab((current) => (current === tabName ? "" : tabName));
@@ -51,7 +50,7 @@ export default function PricingPage() {
     if (editingId) {
       await updateJobPricing(editingId, formData);
     } else {
-      await addJobPricing(formData);
+      await createJobPricing(formData);
     }
 
     setFormData({
@@ -293,7 +292,7 @@ export default function PricingPage() {
                         handleEdit({
                           ...item,
                           materialType: item.materialType ?? null,
-                          notes: item.notes ?? null, // <-- this line fixes your error
+                          notes: item.notes ?? null,
                         })
                       }
                     >
