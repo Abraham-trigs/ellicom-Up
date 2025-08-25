@@ -35,13 +35,14 @@ export default function JobRecorder() {
     cancelEditJob,
     saveEditedJob,
     setEditedJobField,
+    saveJob,
   } = useJobCardStore();
 
-  const { jobPricings } = useJobStore();
+  const jobPricingList = useJobStore((state) => state.jobPricings);
 
   const findUnitPrice = (type: string | null, variable: string | null) => {
     if (!type) return 0;
-    const pricing = jobPricings.find(
+    const pricing = jobPricingList.find(
       (p) =>
         p.jobType === type &&
         (p.variable === variable || p.variable === null || p.variable === "")
@@ -84,7 +85,7 @@ export default function JobRecorder() {
       sideType: currentJob.sideType,
       fileAttached: currentJob.fileAttached,
       material: currentJob.material,
-      isEditing: isLive || isEditing,
+      isEditing: isEditing, // Only true for saved jobs being edited
       onChange: isLive
         ? {
             setJobType,
@@ -139,6 +140,7 @@ export default function JobRecorder() {
       <div key={job.id} className="relative border p-4 rounded-lg bg-surface">
         {renderRecorderByType()}
 
+        {/* Only show edit/save buttons for saved jobs */}
         {!isLive && (
           <div className="mt-2 flex justify-end gap-2">
             {!isEditing && (
