@@ -69,8 +69,8 @@ export default function JobsPage() {
               title={job.details || "No details"}
             >
               <div className="flex justify-between items-center">
-                <h2 className="text-md  text-ground font-bold truncate">
-                  {job.title}
+                <h2 className="text-md text-ground font-bold truncate">
+                  {job.jobType}
                 </h2>
                 <span className="text-xs text-highGold whitespace-nowrap">
                   {job.status}
@@ -83,17 +83,24 @@ export default function JobsPage() {
 
               <div className="flex justify-between text-xs text-ground mt-1">
                 <span className="truncate">
-                  <strong>Type:</strong> {job.type}
+                  <strong>Type:</strong> {job.jobType}
                 </span>
                 <span className="truncate">
                   <strong>Created By:</strong>{" "}
                   {job.createdBy?.name ?? "Unknown"}
                 </span>
               </div>
+
               <div className="flex justify-between text-xs text-ground">
                 <span className="truncate">
                   <strong>Handled By:</strong>{" "}
                   {job.handledBy?.name ?? "Unassigned"}
+                </span>
+                <span className="truncate">
+                  <strong>Unit Price:</strong>{" "}
+                  {job.unitPrice !== undefined
+                    ? `$${job.unitPrice.toFixed(2)}`
+                    : "N/A"}
                 </span>
               </div>
             </li>

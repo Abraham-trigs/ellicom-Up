@@ -1,93 +1,131 @@
+"use client";
+
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export type User = {
-  id: string;
-  name: string;
-  email?: string;
-};
+export type JobStatus = "DRAFT" | "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
-export type Job = {
+export interface Job {
   id: string;
-  title: string;
+  jobType: string;
   details?: string;
-  type: string;
-  status: string;
+  status: JobStatus;
+  createdAt: string;
+  updatedAt: string;
   createdById: string;
   handledById?: string;
-  createdAt?: string;
-  updatedAt?: string;
-};
+  jobPricingId?: string;
+}
 
-export type JobWithUsers = Job & {
-  createdBy?: User | null;
-  handledBy?: User | null;
-};
+export interface JobPricing {
+  id: string;
+  jobType: string;
+  materialType?: string;
+  variable: string;
+  unitPrice: number;
+  modifiers: string[];
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export type JobStore = {
-  jobs: JobWithUsers[];
+interface JobStore {
+  jobs: Job[];
+  jobPricings: JobPricing[];
+  loading: boolean;
+  error?: string;
+
+  // Actions
   fetchJobs: () => Promise<void>;
-  createJob: (job: Omit<Job, "id">) => Promise<void>;
-  updateJob: (id: string, job: Partial<Job>) => Promise<void>;
+  fetchJobPricings: () => Promise<void>;
+  createJob: (job: Partial<Job>) => Promise<void>;
   deleteJob: (id: string) => Promise<void>;
-};
+  createJobPricing: (pricing: Partial<JobPricing>) => Promise<void>;
+  deleteJobPricing: (id: string) => Promise<void>;
+}
 
-export const useJobStore = create<JobStore>((set) => ({
-  jobs: [],
+export const useJobStore = create<JobStore>()(
+  persist(
+    (set, get) => ({
+      jobs: [],
+      jobPricings: [],
+      loading: false,
+      error: undefined,
 
-  fetchJobs: async () => {
-    try {
-      const res = await fetch("/api/jobs");
-      if (!res.ok) throw new Error("Failed to fetch jobs");
-      const data: JobWithUsers[] = await res.json();
-      set({ jobs: data });
-    } catch (err) {
-      console.error("[JobStore.fetchJobs]", err);
-    }
-  },
+      fetchJobs: async () => {
+        set({ loading: true, error: undefined });
+        try {
+          const res = await fetch("/api/jobs");
+          if (!res.ok) throw new Error("Failed to fetch jobs");
+          const data = await res.json();
+          set({ jobs: data, loading: false });
+        } catch (err: any) {
+          set({ error: err.message, loading: false });
+        }
+      },
 
-  createJob: async (job) => {
-    try {
-      const res = await fetch("/api/jobs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(job),
-      });
-      if (!res.ok) throw new Error("Failed to create job");
-      const newJob: JobWithUsers = await res.json();
-      set((state) => ({
-        jobs: [...state.jobs, newJob],
-      }));
-    } catch (err) {
-      console.error("[JobStore.createJob]", err);
-    }
-  },
+      fetchJobPricings: async () => {
+        set({ loading: true, error: undefined });
+        try {
+          const res = await fetch("/api/jobpricing");
+          if (!res.ok) throw new Error("Failed to fetch job pricings");
+          const data = await res.json();
+          set({ jobPricings: data, loading: false });
+        } catch (err: any) {
+          set({ error: err.message, loading: false });
+        }
+      },
 
-  updateJob: async (id, job) => {
-    try {
-      const res = await fetch(`/api/jobs/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(job),
-      });
-      if (!res.ok) throw new Error("Failed to update job");
-      const updated: JobWithUsers = await res.json();
-      set((state) => ({
-        jobs: state.jobs.map((j) => (j.id === id ? updated : j)),
-      }));
-    } catch (err) {
-      console.error("[JobStore.updateJob]", err);
-    }
-  },
+      createJob: async (job) => {
+        try {
+          const res = await fetch("/api/jobs", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(job),
+          });
+          if (!res.ok) throw new Error("Failed to create job");
+          const newJob = await res.json();
+          set({ jobs: [...get().jobs, newJob] });
+        } catch (err: any) {
+          set({ error: err.message });
+        }
+      },
 
-  deleteJob: async (id) => {
-    try {
-      const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete job");
-      set((state) => ({
-        jobs: state.jobs.filter((j) => j.id !== id),
-      }));
-    } catch (err) {
-      console.error("[JobStore.deleteJob]", err);
-    }
-  },
-}));
+      deleteJob: async (id) => {
+        try {
+          const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" });
+          if (!res.ok) throw new Error("Failed to delete job");
+          set({ jobs: get().jobs.filter((j) => j.id !== id) });
+        } catch (err: any) {
+          set({ error: err.message });
+        }
+      },
+
+      createJobPricing: async (pricing) => {
+        try {
+          const res = await fetch("/api/jobpricing", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(pricing),
+          });
+          if (!res.ok) throw new Error("Failed to create job pricing");
+          const newPricing = await res.json();
+          set({ jobPricings: [...get().jobPricings, newPricing] });
+        } catch (err: any) {
+          set({ error: err.message });
+        }
+      },
+
+      deleteJobPricing: async (id) => {
+        try {
+          const res = await fetch(`/api/jobpricing/${id}`, { method: "DELETE" });
+          if (!res.ok) throw new Error("Failed to delete job pricing");
+          set({ jobPricings: get().jobPricings.filter((p) => p.id !== id) });
+        } catch (err: any) {
+          set({ error: err.message });
+        }
+      },
+    }),
+    { name: "job-store" }
+  )
+);
