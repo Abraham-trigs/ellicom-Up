@@ -3,8 +3,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type JobStatus = "DRAFT" | "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+// Job statuses
+export type JobStatus =
+  | "DRAFT"
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED";
 
+// Base models
 export interface Job {
   id: string;
   jobType: string;
@@ -29,18 +36,30 @@ export interface JobPricing {
   updatedAt: string;
 }
 
+// Job with relations
+export interface JobWithUsers extends Job {
+  createdBy?: { id: string; name: string | null; email: string };
+  handledBy?: { id: string; name: string | null; email: string } | null;
+  jobPricing?: { id: string; unitPrice: number; variable: string } | null;
+}
+
+// Store interface
 interface JobStore {
-  jobs: Job[];
+  jobs: JobWithUsers[];
   jobPricings: JobPricing[];
   loading: boolean;
   error?: string;
 
-  // Actions
+  // Job actions
   fetchJobs: () => Promise<void>;
-  fetchJobPricings: () => Promise<void>;
   createJob: (job: Partial<Job>) => Promise<void>;
+  updateJob: (id: string, job: Partial<Job>) => Promise<void>;
   deleteJob: (id: string) => Promise<void>;
+
+  // JobPricing actions
+  fetchJobPricings: () => Promise<void>;
   createJobPricing: (pricing: Partial<JobPricing>) => Promise<void>;
+  updateJobPricing: (id: string, pricing: Partial<JobPricing>) => Promise<void>;
   deleteJobPricing: (id: string) => Promise<void>;
 }
 
@@ -52,25 +71,14 @@ export const useJobStore = create<JobStore>()(
       loading: false,
       error: undefined,
 
+      // ===== JOBS =====
       fetchJobs: async () => {
         set({ loading: true, error: undefined });
         try {
           const res = await fetch("/api/jobs");
           if (!res.ok) throw new Error("Failed to fetch jobs");
-          const data = await res.json();
+          const data: JobWithUsers[] = await res.json();
           set({ jobs: data, loading: false });
-        } catch (err: any) {
-          set({ error: err.message, loading: false });
-        }
-      },
-
-      fetchJobPricings: async () => {
-        set({ loading: true, error: undefined });
-        try {
-          const res = await fetch("/api/jobpricing");
-          if (!res.ok) throw new Error("Failed to fetch job pricings");
-          const data = await res.json();
-          set({ jobPricings: data, loading: false });
         } catch (err: any) {
           set({ error: err.message, loading: false });
         }
@@ -84,8 +92,25 @@ export const useJobStore = create<JobStore>()(
             body: JSON.stringify(job),
           });
           if (!res.ok) throw new Error("Failed to create job");
-          const newJob = await res.json();
+          const newJob: JobWithUsers = await res.json();
           set({ jobs: [...get().jobs, newJob] });
+        } catch (err: any) {
+          set({ error: err.message });
+        }
+      },
+
+      updateJob: async (id, job) => {
+        try {
+          const res = await fetch(`/api/jobs/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(job),
+          });
+          if (!res.ok) throw new Error("Failed to update job");
+          const updated: JobWithUsers = await res.json();
+          set({
+            jobs: get().jobs.map((j) => (j.id === id ? updated : j)),
+          });
         } catch (err: any) {
           set({ error: err.message });
         }
@@ -101,6 +126,19 @@ export const useJobStore = create<JobStore>()(
         }
       },
 
+      // ===== JOB PRICING =====
+      fetchJobPricings: async () => {
+        set({ loading: true, error: undefined });
+        try {
+          const res = await fetch("/api/jobpricing");
+          if (!res.ok) throw new Error("Failed to fetch job pricings");
+          const data: JobPricing[] = await res.json();
+          set({ jobPricings: data, loading: false });
+        } catch (err: any) {
+          set({ error: err.message, loading: false });
+        }
+      },
+
       createJobPricing: async (pricing) => {
         try {
           const res = await fetch("/api/jobpricing", {
@@ -109,8 +147,25 @@ export const useJobStore = create<JobStore>()(
             body: JSON.stringify(pricing),
           });
           if (!res.ok) throw new Error("Failed to create job pricing");
-          const newPricing = await res.json();
+          const newPricing: JobPricing = await res.json();
           set({ jobPricings: [...get().jobPricings, newPricing] });
+        } catch (err: any) {
+          set({ error: err.message });
+        }
+      },
+
+      updateJobPricing: async (id, pricing) => {
+        try {
+          const res = await fetch(`/api/jobpricing/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(pricing),
+          });
+          if (!res.ok) throw new Error("Failed to update job pricing");
+          const updated: JobPricing = await res.json();
+          set({
+            jobPricings: get().jobPricings.map((p) => (p.id === id ? updated : p)),
+          });
         } catch (err: any) {
           set({ error: err.message });
         }
@@ -126,6 +181,6 @@ export const useJobStore = create<JobStore>()(
         }
       },
     }),
-    { name: "job-store" }
+    { name: "job-store" } // persists across reloads
   )
 );
