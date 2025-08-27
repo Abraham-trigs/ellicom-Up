@@ -209,7 +209,7 @@ export default function JobCard() {
           </div>
         </div>
 
-        <div className="mt-6 w-full max-w-lg">{renderRecorder()}</div>
+        {/* <div className="mt-6 w-full max-w-lg">{renderRecorder()}</div> */}
       </div>
 
       <JobTypeModal
