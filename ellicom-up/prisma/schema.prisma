@@ -16,13 +16,15 @@ model User {
   role        Role
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  // Relations
   createdJobs Job[]    @relation("JobsCreated")
   handledJobs Job[]    @relation("JobsHandled")
 }
 
 model Job {
   id           String      @id @default(cuid())
-  jobType      String      // replaced title with jobType
+  jobType      String
   details      String?
   status       JobStatus   @default(DRAFT)
   createdAt    DateTime    @default(now())
@@ -50,6 +52,8 @@ model JobPricing {
   updatedAt    DateTime @updatedAt
 
   jobs         Job[]    // reverse relation
+
+  @@unique([jobType, variable]) // ensures unique jobType + variable
 }
 
 enum JobStatus {
@@ -66,4 +70,3 @@ enum Role {
   STAFF
   CLIENT
 }
-

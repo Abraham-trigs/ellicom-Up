@@ -11,13 +11,8 @@ interface JobTypeModalProps {
   onSelect: (jobType: string) => void;
 }
 
-const backdropStyle = `
-  fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50
-`;
-
-const modalStyle = `
-  bg-container text-coHead rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-sea
-`;
+const backdropStyle = `fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50`;
+const modalStyle = `bg-container text-coHead rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-sea`;
 
 export default function JobTypeModal({
   open,
@@ -34,9 +29,10 @@ export default function JobTypeModal({
   // Deduplicate job types
   const uniqueJobTypes = useMemo(() => {
     const seen = new Set<string>();
-    return jobPricings
+    return (jobPricings || [])
       .map((item) => item.jobType)
       .filter((type) => {
+        if (!type) return false;
         if (seen.has(type)) return false;
         seen.add(type);
         return true;
@@ -44,29 +40,24 @@ export default function JobTypeModal({
       .sort();
   }, [jobPricings]);
 
-  // Filter based on search
-  const filteredJobTypes = useMemo(() => {
-    return uniqueJobTypes.filter((type) =>
-      type.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [uniqueJobTypes, search]);
+  const filteredJobTypes = useMemo(
+    () =>
+      uniqueJobTypes.filter((type) =>
+        type.toLowerCase().includes(search.toLowerCase())
+      ),
+    [uniqueJobTypes, search]
+  );
 
-  // Auto-focus search bar when modal opens and fetch data
+  // Fetch job pricings when modal opens
   useEffect(() => {
-    if (open) {
-      fetchJobPricings();
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setSearch("");
-      setHighlightIndex(-1);
-    }
+    if (!open) return;
+    fetchJobPricings();
+    setTimeout(() => inputRef.current?.focus(), 50);
   }, [open, fetchJobPricings]);
 
-  // Highlight first filtered item on filteredJobTypes or open change
+  // Highlight first item when list changes
   useEffect(() => {
-    if (open) {
-      setHighlightIndex(filteredJobTypes.length > 0 ? 0 : -1);
-    }
+    if (open) setHighlightIndex(filteredJobTypes.length > 0 ? 0 : -1);
   }, [filteredJobTypes, open]);
 
   // Scroll highlighted item into view
@@ -79,8 +70,9 @@ export default function JobTypeModal({
     }
   }, [highlightIndex]);
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (filteredJobTypes.length === 0) return;
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setHighlightIndex((prev) =>
@@ -93,11 +85,12 @@ export default function JobTypeModal({
       );
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (highlightIndex >= 0 && filteredJobTypes[highlightIndex]) {
-        onSelect(filteredJobTypes[highlightIndex]);
-        onClose();
-      } else if (filteredJobTypes.length > 0) {
-        onSelect(filteredJobTypes[0]);
+      const selected =
+        highlightIndex >= 0
+          ? filteredJobTypes[highlightIndex]
+          : filteredJobTypes[0];
+      if (selected) {
+        onSelect(selected);
         onClose();
       }
     } else if (e.key === "Escape") {
@@ -144,32 +137,31 @@ export default function JobTypeModal({
                 Loading...
               </div>
             )}
-
             {error && (
               <div className="text-center text-sm text-red-400">{error}</div>
             )}
 
             {!loading && !error && (
               <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
-                {filteredJobTypes.map((type, index) => (
-                  <button
-                    ref={(el) => (itemRefs.current[index] = el)}
-                    key={type}
-                    onClick={() => {
-                      onSelect(type);
-                      onClose();
-                    }}
-                    className={`font-bold py-2 px-4 rounded-xl transition ${
-                      index === highlightIndex
-                        ? "bg-high text-ground ring-2 ring-gold"
-                        : "bg-sea text-ground hover:bg-high"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
-
-                {filteredJobTypes.length === 0 && (
+                {filteredJobTypes.length > 0 ? (
+                  filteredJobTypes.map((type, index) => (
+                    <button
+                      ref={(el) => (itemRefs.current[index] = el)}
+                      key={type}
+                      onClick={() => {
+                        onSelect(type);
+                        onClose();
+                      }}
+                      className={`font-bold py-2 px-4 rounded-xl transition ${
+                        index === highlightIndex
+                          ? "bg-high text-ground ring-2 ring-gold"
+                          : "bg-sea text-ground hover:bg-high"
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))
+                ) : (
                   <div className="col-span-2 text-center text-sm text-gray-400">
                     No job types found.
                   </div>

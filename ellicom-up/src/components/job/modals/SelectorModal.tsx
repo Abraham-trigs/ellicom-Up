@@ -12,13 +12,8 @@ interface SelectorModalProps {
   jobType: string;
 }
 
-const backdropStyle = `
-  fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50
-`;
-
-const modalStyle = `
-  bg-container text-coHead rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-sea
-`;
+const backdropStyle = `fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50`;
+const modalStyle = `bg-container text-coHead rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-sea`;
 
 export default function SelectorModal({
   open,
@@ -26,16 +21,15 @@ export default function SelectorModal({
   onSelect,
   jobType,
 }: SelectorModalProps) {
-  const { jobPricings, fetchJobPricings, loading, error } = useJobStore();
+  const { jobPricings = [], fetchJobPricings, loading, error } = useJobStore();
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Fetch data on open
   useEffect(() => {
     if (open) {
-      fetchJobPricings();
+      fetchJobPricings?.();
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
       setSearch("");
@@ -43,14 +37,12 @@ export default function SelectorModal({
     }
   }, [open, fetchJobPricings]);
 
-  // Select either materialType or variable depending on jobType
   const options = useMemo(() => {
     if (!jobType) return [];
-
     const filtered = jobPricings.filter((jp) => jp.jobType === jobType);
 
+    const seen = new Set<string>();
     if (jobType === "Designing") {
-      const seen = new Set<string>();
       return filtered
         .map((jp) => jp.variable)
         .filter((v) => v && !seen.has(v) && seen.add(v))
@@ -58,7 +50,6 @@ export default function SelectorModal({
           search ? v.toLowerCase().includes(search.toLowerCase()) : true
         );
     } else {
-      const seen = new Set<string>();
       return filtered
         .map((jp) => jp.materialType)
         .filter((mat): mat is string => !!mat)
@@ -85,6 +76,7 @@ export default function SelectorModal({
   }, [highlightIndex]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (options.length === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setHighlightIndex((prev) => (prev < options.length - 1 ? prev + 1 : 0));
@@ -93,11 +85,10 @@ export default function SelectorModal({
       setHighlightIndex((prev) => (prev > 0 ? prev - 1 : options.length - 1));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (highlightIndex >= 0 && options[highlightIndex]) {
-        onSelect(options[highlightIndex]);
-        onClose();
-      } else if (options.length > 0) {
-        onSelect(options[0]);
+      const selected =
+        highlightIndex >= 0 ? options[highlightIndex] : options[0];
+      if (selected) {
+        onSelect(selected);
         onClose();
       }
     } else if (e.key === "Escape") {
@@ -146,34 +137,31 @@ export default function SelectorModal({
                 Loading...
               </div>
             )}
-
             {error && (
               <div className="text-center text-sm text-red-400">{error}</div>
             )}
 
             {!loading && !error && (
               <div className="max-h-60 overflow-y-auto space-y-2">
-                {options.map((option, idx) => (
-                  <button
-                    key={option}
-                    ref={(el: HTMLButtonElement | null) => {
-                      itemRefs.current[idx] = el;
-                    }}
-                    onClick={() => {
-                      onSelect(option);
-                      onClose();
-                    }}
-                    className={`w-full text-left px-4 py-2 rounded-xl font-semibold transition ${
-                      idx === highlightIndex
-                        ? "bg-high text-ground ring-2 ring-gold"
-                        : "bg-sea text-ground hover:bg-high"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-
-                {options.length === 0 && (
+                {options.length > 0 ? (
+                  options.map((option, idx) => (
+                    <button
+                      key={option}
+                      ref={(el) => (itemRefs.current[idx] = el)}
+                      onClick={() => {
+                        onSelect(option);
+                        onClose();
+                      }}
+                      className={`w-full text-left px-4 py-2 rounded-xl font-semibold transition ${
+                        idx === highlightIndex
+                          ? "bg-high text-ground ring-2 ring-gold"
+                          : "bg-sea text-ground hover:bg-high"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))
+                ) : (
                   <div className="text-center text-sm text-gray-400">
                     No options found.
                   </div>

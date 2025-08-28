@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React from "react";
 import { useJobStore } from "@/lib/store/JobStore";
 
 import JobTypeModal from "@/components/job/modals/JobTypeModal";
@@ -8,16 +8,10 @@ import PaperSizeModal from "@/components/job/modals/PaperSizeModal";
 import QuantityModal from "@/components/job/modals/QuantityModal";
 import SelectorModal from "@/components/job/modals/SelectorModal";
 
-import DesigningRecorder from "@/components/job/Recorders/DesigningRecorder";
-import LargeFormatRecorder from "@/components/job/Recorders/LargeFormatRecorder";
-import PapperPrintingRecorder from "@/components/job/Recorders/PapperPrintingRecorder";
-import ScanningRecorder from "@/components/job/Recorders/ScanningRecorder";
-import PhotocopyRecorder from "@/components/job/Recorders/PhotocopyRecorder";
-
 export default function JobCard() {
-  const { currentJob, setCurrentJob, saveJob, jobPricings } = useJobStore();
+  const { currentJob, setCurrentJob, saveCurrentJob, savedJobs, jobPricings } =
+    useJobStore();
 
-  // Modal state
   const [isJobTypeModalOpen, setJobTypeModalOpen] = React.useState(false);
   const [isPaperSizeModalOpen, setPaperSizeModalOpen] = React.useState(false);
   const [isQuantityModalOpen, setQuantityModalOpen] = React.useState(false);
@@ -32,80 +26,34 @@ export default function JobCard() {
   const openMaterialModal = () => setMaterialModalOpen(true);
   const closeMaterialModal = () => setMaterialModalOpen(false);
 
-  const setJobType = (type: string) =>
-    setCurrentJob({ ...currentJob, jobType: type });
+  const updateJob = (field: keyof typeof currentJob, value: any) => {
+    setCurrentJob({ ...currentJob, [field]: value });
+  };
 
-  const setMaterial = (material: string) =>
-    setCurrentJob({ ...currentJob, material });
-
-  const setPaperSize = (size: string) =>
-    setCurrentJob({ ...currentJob, paperSize: size });
-
-  const setQuantity = (qty: number) =>
-    setCurrentJob({ ...currentJob, quantity: qty });
-
+  const setJobType = (type: string) => updateJob("jobType", type);
+  const setMaterial = (material: string) => updateJob("material", material);
+  const setPaperSize = (size: string) => updateJob("paperSize", size);
+  const setQuantity = (qty: number) => updateJob("quantity", qty);
   const setColorType = (type: "Color" | "Black") =>
-    setCurrentJob({ ...currentJob, colorType: type });
-
+    updateJob("colorType", type);
   const toggleSideType = () =>
-    setCurrentJob({
-      ...currentJob,
-      sideType:
-        currentJob?.sideType === "Front & Back" ? "Front" : "Front & Back",
-    });
+    updateJob(
+      "sideType",
+      currentJob?.sideType === "Front & Back" ? "Front" : "Front & Back"
+    );
 
   const isJobSelected = Boolean(currentJob?.jobType);
 
-  const selectedPricing = useMemo(() => {
-    if (currentJob?.jobType !== "Designing" || !currentJob?.material)
-      return null;
-
-    return jobPricings.find(
-      (item) =>
-        item.jobType === "Designing" &&
-        item.variable.toLowerCase() === currentJob.material.toLowerCase()
-    );
-  }, [currentJob?.jobType, currentJob?.material, jobPricings]);
-
-  const formattedPrice =
-    selectedPricing?.unitPrice !== undefined
-      ? `₵${selectedPricing.unitPrice.toFixed(2)}`
-      : "--";
-
   const handleSaveOrder = () => {
     if (!isJobSelected) return;
-    saveJob(); // saves current job and resets in store
-  };
-
-  const renderRecorder = () => {
-    switch (currentJob?.jobType) {
-      case "Photocopy":
-        return <PhotocopyRecorder />;
-      case "Printing":
-        return <PapperPrintingRecorder />;
-      case "Large Format":
-        return <LargeFormatRecorder />;
-      case "Scanning":
-        return <ScanningRecorder />;
-      case "Designing":
-        return (
-          <DesigningRecorder
-            jobType={currentJob.jobType}
-            variable={currentJob.material || ""}
-            unitPrice={selectedPricing?.unitPrice || 0}
-            isEditing={true}
-            onChange={{ setJobType, setMaterial }}
-          />
-        );
-      default:
-        return null;
-    }
+    saveCurrentJob();
   };
 
   return (
     <>
       <div className="w-full flex flex-col items-center">
         <div className="w-full sm:max-w-md md:max-w-lg border-2 border-sea bg-darkSea rounded-3xl mt-2 p-4 flex flex-col gap-4">
+          {/* Job Type */}
           <div className="flex justify-center">
             <div
               onClick={openModal}
@@ -115,6 +63,7 @@ export default function JobCard() {
             </div>
           </div>
 
+          {/* Material / Paper / Quantity */}
           <div className="flex flex-col gap-4 lg:flex-row lg:flex-wrap lg:justify-between">
             <div className="flex-1 min-w-[220px] flex items-center justify-between gap-2 bg-high rounded-xl p-2 shadow-md">
               <div
@@ -124,7 +73,7 @@ export default function JobCard() {
                 }`}
               >
                 <div className="text-center font-semibold text-coHead text-sm border-b-2 border-coHead">
-                  {currentJob?.jobType === "Designing" ? "Type" : "Material"}
+                  Material
                 </div>
                 <span className="text-xs mt-1">
                   {currentJob?.material || "--"}
@@ -133,13 +82,9 @@ export default function JobCard() {
 
               <div className="flex flex-col gap-2 justify-center">
                 <div
-                  className={`w-24 h-8 rounded-md bg-ground text-coHead flex justify-center items-center text-sm font-semibold ${
-                    !isJobSelected ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`w-24 h-8 rounded-md bg-ground text-coHead flex justify-center items-center text-sm font-semibold`}
                 >
-                  {currentJob?.jobType === "Designing"
-                    ? formattedPrice
-                    : currentJob?.paperSize || "Size"}
+                  {currentJob?.paperSize || "Size"}
                 </div>
 
                 <div
@@ -208,10 +153,9 @@ export default function JobCard() {
             </button>
           </div>
         </div>
-
-        {/* <div className="mt-6 w-full max-w-lg">{renderRecorder()}</div> */}
       </div>
 
+      {/* Modals */}
       <JobTypeModal
         open={isJobTypeModalOpen}
         onClose={closeModal}

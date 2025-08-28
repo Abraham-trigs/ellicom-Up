@@ -3,136 +3,86 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// Job statuses
-export type JobStatus =
-  | "DRAFT"
-  | "PENDING"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED";
-
-// Base models
-export interface Job {
-  id: string;
-  jobType: string;
-  details?: string;
-  status: JobStatus;
-  createdAt: string;
-  updatedAt: string;
-  createdById: string;
-  handledById?: string;
-  jobPricingId?: string;
-}
+export type JobStatus = "DRAFT" | "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
 export interface JobPricing {
   id: string;
   jobType: string;
-  materialType?: string;
+  materialType?: string; // matches Prisma
   variable: string;
   unitPrice: number;
-  modifiers: string[];
+  modifiers?: string[];
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
-// Job with relations
-export interface JobWithUsers extends Job {
-  createdBy?: { id: string; name: string | null; email: string };
-  handledBy?: { id: string; name: string | null; email: string } | null;
-  jobPricing?: { id: string; unitPrice: number; variable: string } | null;
+export interface JobWithUsers {
+  id: string;
+  jobType: string;
+  materialType?: string; // renamed to match backend
+  paperSize?: string;
+  quantity?: number;
+  colorType?: "Color" | "Black";
+  sideType?: "Front" | "Front & Back";
+  fileAttached?: boolean;
+  details?: string;
+  unitPrice?: number;
 }
 
-// Store interface
 interface JobStore {
-  jobs: JobWithUsers[];
-  jobPricings: JobPricing[];
   currentJob?: JobWithUsers;
+  savedJobs: JobWithUsers[];
+  jobPricings: JobPricing[];
   loading: boolean;
   error?: string;
 
-  // Job actions
-  fetchJobs: () => Promise<void>;
-  createJob: (job: Partial<Job>) => Promise<void>;
-  updateJob: (id: string, job: Partial<Job>) => Promise<void>;
-  deleteJob: (id: string) => Promise<void>;
-
-  // JobPricing actions
-  fetchJobPricings: () => Promise<void>;
-  createJobPricing: (pricing: Partial<JobPricing>) => Promise<void>;
-  updateJobPricing: (id: string, pricing: Partial<JobPricing>) => Promise<void>;
-  deleteJobPricing: (id: string) => Promise<void>;
-
-  // Current job actions
   setCurrentJob: (job: JobWithUsers) => void;
-  saveJob: (job: JobWithUsers) => Promise<void>;
+  setJobPricings: (pricing: JobPricing[]) => void;
+  fetchJobPricings: () => Promise<void>;
+
+  saveCurrentJob: () => void;
+  startNewJob: () => void;
+  editJob: (jobId: string) => void;
+  cancelEdit: () => void;
+
+  resetCurrentJob: () => void;
+  clearSavedJobs: () => void;
 }
 
 export const useJobStore = create<JobStore>()(
   persist(
     (set, get) => ({
-      jobs: [],
+      currentJob: {
+        id: crypto.randomUUID(),
+        jobType: "",
+        materialType: undefined,
+        paperSize: undefined,
+        quantity: undefined,
+        colorType: "Color",
+        sideType: "Front",
+        fileAttached: false,
+        details: "",
+        unitPrice: 0,
+      },
+      savedJobs: [],
       jobPricings: [],
-      currentJob: undefined,
       loading: false,
       error: undefined,
 
-      // ===== JOBS =====
-      fetchJobs: async () => {
-        set({ loading: true, error: undefined });
-        try {
-          const res = await fetch("/api/jobs");
-          if (!res.ok) throw new Error("Failed to fetch jobs");
-          const data: JobWithUsers[] = await res.json();
-          set({ jobs: data, loading: false });
-        } catch (err: any) {
-          set({ error: err.message, loading: false });
+      setCurrentJob: (job) => {
+        let price = 0;
+        if (job.jobType && job.materialType) {
+          const pricing = get().jobPricings.find(
+            (p) =>
+              p.jobType === job.jobType &&
+              p.variable.toLowerCase() === job.materialType?.toLowerCase()
+          );
+          if (pricing) price = pricing.unitPrice;
         }
+        set({ currentJob: { ...job, unitPrice: price } });
       },
 
-      createJob: async (job) => {
-        try {
-          const res = await fetch("/api/jobs", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(job),
-          });
-          if (!res.ok) throw new Error("Failed to create job");
-          const newJob: JobWithUsers = await res.json();
-          set({ jobs: [...get().jobs, newJob] });
-        } catch (err: any) {
-          set({ error: err.message });
-        }
-      },
+      setJobPricings: (pricing) => set({ jobPricings: pricing }),
 
-      updateJob: async (id, job) => {
-        try {
-          const res = await fetch(`/api/jobs/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(job),
-          });
-          if (!res.ok) throw new Error("Failed to update job");
-          const updated: JobWithUsers = await res.json();
-          set({
-            jobs: get().jobs.map((j) => (j.id === id ? updated : j)),
-          });
-        } catch (err: any) {
-          set({ error: err.message });
-        }
-      },
-
-      deleteJob: async (id) => {
-        try {
-          const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" });
-          if (!res.ok) throw new Error("Failed to delete job");
-          set({ jobs: get().jobs.filter((j) => j.id !== id) });
-        } catch (err: any) {
-          set({ error: err.message });
-        }
-      },
-
-      // ===== JOB PRICING =====
       fetchJobPricings: async () => {
         set({ loading: true, error: undefined });
         try {
@@ -141,67 +91,68 @@ export const useJobStore = create<JobStore>()(
           const data: JobPricing[] = await res.json();
           set({ jobPricings: data, loading: false });
         } catch (err: any) {
-          set({ error: err.message, loading: false });
+          console.error("fetchJobPricings error:", err);
+          set({ error: err.message || "Failed to fetch job pricings", loading: false });
         }
       },
 
-      createJobPricing: async (pricing) => {
-        try {
-          const res = await fetch("/api/jobpricing", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(pricing),
-          });
-          if (!res.ok) throw new Error("Failed to create job pricing");
-          const newPricing: JobPricing = await res.json();
-          set({ jobPricings: [...get().jobPricings, newPricing] });
-        } catch (err: any) {
-          set({ error: err.message });
-        }
+      startNewJob: () => {
+        set({
+          currentJob: {
+            id: crypto.randomUUID(),
+            jobType: "",
+            materialType: undefined,
+            paperSize: undefined,
+            quantity: undefined,
+            colorType: "Color",
+            sideType: "Front",
+            fileAttached: false,
+            details: "",
+            unitPrice: 0,
+          },
+        });
       },
 
-      updateJobPricing: async (id, pricing) => {
-        try {
-          const res = await fetch(`/api/jobpricing/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(pricing),
-          });
-          if (!res.ok) throw new Error("Failed to update job pricing");
-          const updated: JobPricing = await res.json();
-          set({
-            jobPricings: get().jobPricings.map((p) =>
-              p.id === id ? updated : p
-            ),
-          });
-        } catch (err: any) {
-          set({ error: err.message });
-        }
-      },
+      saveCurrentJob: () => {
+        const job = get().currentJob;
+        if (!job?.jobType) return;
 
-      deleteJobPricing: async (id) => {
-        try {
-          const res = await fetch(`/api/jobpricing/${id}`, {
-            method: "DELETE",
-          });
-          if (!res.ok) throw new Error("Failed to delete job pricing");
-          set({ jobPricings: get().jobPricings.filter((p) => p.id !== id) });
-        } catch (err: any) {
-          set({ error: err.message });
-        }
-      },
-
-      // ===== CURRENT JOB =====
-      setCurrentJob: (job) => set({ currentJob: job }),
-
-      saveJob: async (job) => {
-        if (job.id === "live") {
-          await get().createJob(job);
+        const existingIndex = get().savedJobs.findIndex((j) => j.id === job.id);
+        if (existingIndex >= 0) {
+          const updatedJobs = [...get().savedJobs];
+          updatedJobs[existingIndex] = job;
+          set({ savedJobs: updatedJobs, currentJob: undefined });
         } else {
-          await get().updateJob(job.id, job);
+          set({ savedJobs: [job, ...get().savedJobs], currentJob: undefined });
         }
       },
+
+      editJob: (jobId: string) => {
+        const jobToEdit = get().savedJobs.find((j) => j.id === jobId);
+        if (jobToEdit) set({ currentJob: { ...jobToEdit } });
+      },
+
+      cancelEdit: () => set({ currentJob: undefined }),
+
+      resetCurrentJob: () => {
+        set({
+          currentJob: {
+            id: crypto.randomUUID(),
+            jobType: "",
+            materialType: undefined,
+            paperSize: undefined,
+            quantity: undefined,
+            colorType: "Color",
+            sideType: "Front",
+            fileAttached: false,
+            details: "",
+            unitPrice: 0,
+          },
+        });
+      },
+
+      clearSavedJobs: () => set({ savedJobs: [] }),
     }),
-    { name: "job-store" } // persists across reloads
+    { name: "job-store" }
   )
 );
