@@ -19,7 +19,7 @@ export default function JobCard() {
 
   // fetch available options for this job type (from JobPricing in store)
   const { colorOptions = [], sideOptions = [] } =
-    getJobOptions(currentJob?.jobType) || {};
+    getJobOptions?.(currentJob?.jobType) || {};
 
   const updateJob = (field: keyof typeof currentJob, value: any) => {
     setCurrentJob({ ...currentJob, [field]: value });
@@ -104,36 +104,62 @@ export default function JobCard() {
             <div className="flex-1 min-w-[220px] flex flex-col items-center bg-high p-3 rounded-2xl shadow-md">
               {/* Dynamic Colors */}
               <div className="flex gap-2 mb-2">
-                {colorOptions.map((type) => (
-                  <div
-                    key={type}
-                    onClick={() => setColorType(type)}
-                    className={`w-16 h-8 text-sm rounded-md flex items-center justify-center font-semibold cursor-pointer ${
-                      currentJob?.colorType === type
-                        ? "bg-green-500 text-container"
-                        : "bg-coHead text-ground"
-                    }`}
-                  >
-                    {type}
-                  </div>
-                ))}
+                {(colorOptions.length > 0
+                  ? colorOptions
+                  : ["Color", "Black"]
+                ).map((type) => {
+                  const isActive =
+                    colorOptions.length > 0 && currentJob?.colorType === type;
+
+                  return (
+                    <div
+                      key={type}
+                      onClick={() =>
+                        colorOptions.length > 0 && setColorType(type)
+                      }
+                      className={`w-16 h-8 text-sm rounded-md flex items-center justify-center font-semibold 
+                          ${
+                            colorOptions.length === 0
+                              ? "bg-inactive text-ground opacity-50 cursor-not-allowed"
+                              : isActive
+                              ? "bg-green-500 text-container"
+                              : "bg-coHead text-ground cursor-pointer"
+                          }`}
+                    >
+                      {type}
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Dynamic Side Options */}
               <div className="flex gap-2">
-                {sideOptions.map((side) => (
-                  <div
-                    key={side}
-                    onClick={() => updateJob("sideType", side)}
-                    className={`w-16 h-8 text-sm rounded-md flex items-center justify-center font-bold cursor-pointer ${
-                      currentJob?.sideType === side
-                        ? "bg-green-500 text-container"
-                        : "bg-coHead text-ground"
-                    }`}
-                  >
-                    {side === "Front & Back" ? "F/B" : side}
-                  </div>
-                ))}
+                {(sideOptions.length > 0
+                  ? sideOptions
+                  : ["Front", "Front & Back"]
+                ).map((side) => {
+                  const isActive =
+                    sideOptions.length > 0 && currentJob?.sideType === side;
+
+                  return (
+                    <div
+                      key={side}
+                      onClick={() =>
+                        sideOptions.length > 0 && updateJob("sideType", side)
+                      }
+                      className={`w-16 h-8 text-sm rounded-md flex items-center justify-center font-bold 
+                        ${
+                          sideOptions.length === 0
+                            ? "bg-inactive text-ground opacity-50 cursor-not-allowed"
+                            : isActive
+                            ? "bg-green-500 text-container"
+                            : "bg-coHead text-ground cursor-pointer"
+                        }`}
+                    >
+                      {side === "Front & Back" ? "F/B" : side}
+                    </div>
+                  );
+                })}
 
                 {/* File status */}
                 <div

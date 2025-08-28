@@ -88,45 +88,46 @@ export const useJobStore = create<JobStore>()(
       loading: false,
       error: undefined,
 
-      setCurrentJob: (job) => {
-        let price = 0;
-        let colorOptions: string[] = ["Color", "Black"];
-        let sideOptions: string[] = ["Front", "Front & Back"];
+    setCurrentJob: (job) => {
+      let price = 0;
+      let colorOptions: string[] = [];
+      let sideOptions: string[] = [];
 
-        if (job.jobType && job.materialType) {
-          const pricing = get().jobPricings.find(
-            (p) =>
-              p.jobType === job.jobType &&
-              p.variable.toLowerCase() === job.materialType?.toLowerCase()
-          );
-          if (pricing) {
-            price = pricing.unitPrice;
-            colorOptions = pricing.colorOptions || colorOptions;
-            sideOptions = pricing.sideOptions || sideOptions;
-          }
+      if (job.jobType && job.materialType) {
+        const pricing = get().jobPricings.find(
+          (p) =>
+            p.jobType === job.jobType &&
+            p.variable.toLowerCase() === job.materialType?.toLowerCase()
+        );
+
+        if (pricing) {
+          price = pricing.unitPrice;
+          colorOptions = pricing.colorOptions || [];
+          sideOptions = pricing.sideOptions || [];
         }
+      }
 
-        // Keep previous selection if still valid
-        const colorType =
-          job.colorType && colorOptions.includes(job.colorType)
-            ? job.colorType
-            : colorOptions[0];
-        const sideType =
-          job.sideType && sideOptions.includes(job.sideType)
-            ? job.sideType
-            : sideOptions[0];
+      // Keep previous selection if still valid
+      const colorType =
+        job.colorType && colorOptions.includes(job.colorType)
+          ? job.colorType
+          : colorOptions[0]; // ✅ will be undefined if no options
+      const sideType =
+        job.sideType && sideOptions.includes(job.sideType)
+          ? job.sideType
+          : sideOptions[0]; // ✅ same here
 
-        set({
-          currentJob: {
-            ...job,
-            unitPrice: price,
-            colorOptions,
-            sideOptions,
-            colorType,
-            sideType,
-          },
-        });
-      },
+      set({
+        currentJob: {
+          ...job,
+          unitPrice: price,
+          colorOptions,
+          sideOptions,
+          colorType,
+          sideType,
+        },
+      });
+    },
 
       setJobPricings: (pricing) => set({ jobPricings: pricing }),
 
