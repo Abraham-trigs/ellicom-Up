@@ -36,6 +36,15 @@ export default function EditJobModal({
     return pricing?.unitPrice || 0;
   };
 
+  const handleSave = () => {
+    const updatedJob = {
+      ...localJob,
+      unitPrice: calculateUnitPrice(localJob),
+    };
+    onSave(updatedJob);
+    onClose();
+  };
+
   return (
     <>
       <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
@@ -131,14 +140,7 @@ export default function EditJobModal({
           <div className="flex gap-2 mt-4">
             <button
               className="flex-1 py-2 bg-gold text-darkSea font-semibold rounded hover:bg-highGold"
-              onClick={() => {
-                // Calculate unit price
-                const updatedJob = {
-                  ...localJob,
-                  unitPrice: calculateUnitPrice(localJob),
-                };
-                onSave(updatedJob);
-              }}
+              onClick={handleSave}
             >
               Save Changes
             </button>
