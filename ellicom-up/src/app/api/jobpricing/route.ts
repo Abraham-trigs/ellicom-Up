@@ -1,4 +1,3 @@
-// app/api/jobpricing/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -11,7 +10,10 @@ export async function GET() {
     return NextResponse.json(pricings);
   } catch (err) {
     console.error("GET /api/jobpricing error:", err);
-    return NextResponse.json({ error: "Failed to fetch job pricings" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch job pricings" },
+      { status: 500 }
+    );
   }
 }
 
@@ -27,11 +29,16 @@ export async function POST(req: Request) {
         unitPrice: body.unitPrice,
         modifiers: body.modifiers || [],
         notes: body.notes,
+        colorOptions: body.colorOptions || ["Color", "Black"],
+        sideOptions: body.sideOptions || ["Front", "Front & Back"],
       },
     });
     return NextResponse.json(pricing, { status: 201 });
   } catch (err) {
     console.error("POST /api/jobpricing error:", err);
-    return NextResponse.json({ error: "Failed to create job pricing" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create job pricing" },
+      { status: 500 }
+    );
   }
 }

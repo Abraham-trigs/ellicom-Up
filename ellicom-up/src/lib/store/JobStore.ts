@@ -3,26 +3,35 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type JobStatus = "DRAFT" | "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+export type JobStatus =
+  | "DRAFT"
+  | "PENDING"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED";
 
 export interface JobPricing {
   id: string;
   jobType: string;
-  materialType?: string; // matches Prisma
+  materialType?: string;
   variable: string;
   unitPrice: number;
   modifiers?: string[];
   notes?: string;
+  colorOptions?: string[]; // ["Color", "Black"]
+  sideOptions?: string[]; // ["Front", "Front & Back"]
 }
 
 export interface JobWithUsers {
   id: string;
   jobType: string;
-  materialType?: string; // renamed to match backend
+  materialType?: string;
   paperSize?: string;
   quantity?: number;
-  colorType?: "Color" | "Black";
-  sideType?: "Front" | "Front & Back";
+  colorType?: string;
+  sideType?: string;
+  colorOptions?: string[];
+  sideOptions?: string[];
   fileAttached?: boolean;
   details?: string;
   unitPrice?: number;
@@ -43,9 +52,18 @@ interface JobStore {
   startNewJob: () => void;
   editJob: (jobId: string) => void;
   cancelEdit: () => void;
-
   resetCurrentJob: () => void;
   clearSavedJobs: () => void;
+
+  // ✅ new
+  getJobOptions: (
+    jobType?: string
+  ) =>
+    | {
+        colorOptions: string[];
+        sideOptions: string[];
+      }
+    | null;
 }
 
 export const useJobStore = create<JobStore>()(
@@ -59,6 +77,8 @@ export const useJobStore = create<JobStore>()(
         quantity: undefined,
         colorType: "Color",
         sideType: "Front",
+        colorOptions: ["Color", "Black"],
+        sideOptions: ["Front", "Front & Back"],
         fileAttached: false,
         details: "",
         unitPrice: 0,
@@ -70,15 +90,42 @@ export const useJobStore = create<JobStore>()(
 
       setCurrentJob: (job) => {
         let price = 0;
+        let colorOptions: string[] = ["Color", "Black"];
+        let sideOptions: string[] = ["Front", "Front & Back"];
+
         if (job.jobType && job.materialType) {
           const pricing = get().jobPricings.find(
             (p) =>
               p.jobType === job.jobType &&
               p.variable.toLowerCase() === job.materialType?.toLowerCase()
           );
-          if (pricing) price = pricing.unitPrice;
+          if (pricing) {
+            price = pricing.unitPrice;
+            colorOptions = pricing.colorOptions || colorOptions;
+            sideOptions = pricing.sideOptions || sideOptions;
+          }
         }
-        set({ currentJob: { ...job, unitPrice: price } });
+
+        // Keep previous selection if still valid
+        const colorType =
+          job.colorType && colorOptions.includes(job.colorType)
+            ? job.colorType
+            : colorOptions[0];
+        const sideType =
+          job.sideType && sideOptions.includes(job.sideType)
+            ? job.sideType
+            : sideOptions[0];
+
+        set({
+          currentJob: {
+            ...job,
+            unitPrice: price,
+            colorOptions,
+            sideOptions,
+            colorType,
+            sideType,
+          },
+        });
       },
 
       setJobPricings: (pricing) => set({ jobPricings: pricing }),
@@ -92,7 +139,10 @@ export const useJobStore = create<JobStore>()(
           set({ jobPricings: data, loading: false });
         } catch (err: any) {
           console.error("fetchJobPricings error:", err);
-          set({ error: err.message || "Failed to fetch job pricings", loading: false });
+          set({
+            error: err.message || "Failed to fetch job pricings",
+            loading: false,
+          });
         }
       },
 
@@ -106,6 +156,8 @@ export const useJobStore = create<JobStore>()(
             quantity: undefined,
             colorType: "Color",
             sideType: "Front",
+            colorOptions: ["Color", "Black"],
+            sideOptions: ["Front", "Front & Back"],
             fileAttached: false,
             details: "",
             unitPrice: 0,
@@ -144,6 +196,8 @@ export const useJobStore = create<JobStore>()(
             quantity: undefined,
             colorType: "Color",
             sideType: "Front",
+            colorOptions: ["Color", "Black"],
+            sideOptions: ["Front", "Front & Back"],
             fileAttached: false,
             details: "",
             unitPrice: 0,
@@ -152,6 +206,18 @@ export const useJobStore = create<JobStore>()(
       },
 
       clearSavedJobs: () => set({ savedJobs: [] }),
+
+      // ✅ Implementation for JobCard
+      getJobOptions: (jobType?: string) => {
+        if (!jobType) return null;
+        const pricing = get().jobPricings.find((p) => p.jobType === jobType);
+        if (!pricing) return null;
+
+        return {
+          colorOptions: pricing.colorOptions || ["Color", "Black"],
+          sideOptions: pricing.sideOptions || ["Front", "Front & Back"],
+        };
+      },
     }),
     { name: "job-store" }
   )

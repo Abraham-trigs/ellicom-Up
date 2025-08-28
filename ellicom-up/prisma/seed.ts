@@ -23,11 +23,7 @@ async function main() {
     });
   }
 
-  const createdUsers = await prisma.user.createMany({
-    data: users,
-    skipDuplicates: true,
-  });
-
+  await prisma.user.createMany({ data: users, skipDuplicates: true });
   console.log("Users seeded!");
 
   // ---------------------
@@ -59,14 +55,15 @@ async function main() {
       unitPrice: 5 + Math.floor(Math.random() * 50),
       modifiers: modifiersList[i % modifiersList.length],
       notes: `Pricing note ${i + 1}`,
+      colorOptions: ["Color", "Black"],
+      sideOptions: ["Front", "Front & Back"],
     });
   }
 
-  const createdJobPricings = await prisma.jobPricing.createMany({
+  await prisma.jobPricing.createMany({
     data: jobPricings,
     skipDuplicates: true,
   });
-
   console.log("JobPricings seeded!");
 
   // ---------------------
@@ -75,7 +72,6 @@ async function main() {
   const jobStatuses = ["DRAFT", "IN_PROGRESS", "COMPLETED", "CANCELLED"];
   const allUsers = await prisma.user.findMany();
   const allPricings = await prisma.jobPricing.findMany();
-
 
   const jobs = [];
 
@@ -95,7 +91,6 @@ async function main() {
   }
 
   await prisma.job.createMany({ data: jobs });
-
   console.log("Jobs seeded!");
 }
 

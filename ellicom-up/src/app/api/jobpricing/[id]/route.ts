@@ -1,14 +1,18 @@
-// app/api/jobpricing/[id]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET a single pricing by ID
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+// GET one job pricing by id
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const pricing = await prisma.jobPricing.findUnique({
       where: { id: params.id },
     });
-    if (!pricing) return NextResponse.json({ error: "JobPricing not found" }, { status: 404 });
+    if (!pricing) {
+      return NextResponse.json({ error: "Job pricing not found" }, { status: 404 });
+    }
     return NextResponse.json(pricing);
   } catch (err) {
     console.error("GET /api/jobpricing/[id] error:", err);
@@ -16,8 +20,11 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   }
 }
 
-// PATCH update pricing by ID
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+// PUT update job pricing by id
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const body = await req.json();
     const updated = await prisma.jobPricing.update({
@@ -27,22 +34,29 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         materialType: body.materialType,
         variable: body.variable,
         unitPrice: body.unitPrice,
-        modifiers: body.modifiers,
+        modifiers: body.modifiers || [],
         notes: body.notes,
+        colorOptions: body.colorOptions || ["Color", "Black"],
+        sideOptions: body.sideOptions || ["Front", "Front & Back"],
       },
     });
     return NextResponse.json(updated);
   } catch (err) {
-    console.error("PATCH /api/jobpricing/[id] error:", err);
+    console.error("PUT /api/jobpricing/[id] error:", err);
     return NextResponse.json({ error: "Failed to update job pricing" }, { status: 500 });
   }
 }
 
-// DELETE pricing by ID
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+// DELETE job pricing by id
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
-    await prisma.jobPricing.delete({ where: { id: params.id } });
-    return NextResponse.json({ message: "JobPricing deleted" });
+    await prisma.jobPricing.delete({
+      where: { id: params.id },
+    });
+    return NextResponse.json({ message: "Job pricing deleted successfully" });
   } catch (err) {
     console.error("DELETE /api/jobpricing/[id] error:", err);
     return NextResponse.json({ error: "Failed to delete job pricing" }, { status: 500 });

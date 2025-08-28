@@ -27,7 +27,7 @@ model Job {
   jobType      String
   details      String?
   status       JobStatus   @default(DRAFT)
-  createdAt    DateTime    @default(now())
+  createdAt    DateTime    @defaultA(now())
   updatedAt    DateTime    @updatedAt
 
   // Relations
@@ -48,12 +48,12 @@ model JobPricing {
   unitPrice    Float
   modifiers    String[]
   notes        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  colorOptions String[]  // ["Color", "Black"]
+  sideOptions  String[]  // ["Front", "Front & Back"]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  jobs         Job[]    // reverse relation
-
-  @@unique([jobType, variable]) // ensures unique jobType + variable
+  jobs         Job[]
 }
 
 enum JobStatus {
