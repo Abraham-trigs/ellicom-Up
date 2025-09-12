@@ -3,6 +3,7 @@
 import Navbar from "@/components/home/Navbar";
 import TagAndSlider from "@/components/home/TagAndSlider";
 import ImageDisplay from "@/components/home/ImageDisplay";
+import SendJobButton from "@/components/SendJobButton";
 
 export default function Home() {
   const bannerImages = [
@@ -32,6 +33,12 @@ export default function Home() {
           images={bannerImages}
           alt="Large Format Printing Banner"
         />
+        <div className="flex justify-center -mt-20 mb-16">
+          <SendJobButton
+            label="Send Print / Designs Now"
+            onClick={() => alert("Send Print / Designs Now clicked")}
+          />
+        </div>
       </main>
     </>
   );

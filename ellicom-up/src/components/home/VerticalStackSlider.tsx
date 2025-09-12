@@ -2,15 +2,24 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { Send } from "lucide-react";
+import SendJobButton from "../SendJobButton";
 
 const images = [
-  "https://picsum.photos/id/1015/400/600",
-  "https://picsum.photos/id/1016/400/600",
-  "https://picsum.photos/id/1018/400/600",
-  "https://picsum.photos/id/1019/400/600",
-  "https://picsum.photos/id/1020/400/600",
-  "https://picsum.photos/id/1024/400/600",
-  "https://picsum.photos/id/1027/400/600",
+  "/show-1.webp",
+  "/show-2.webp",
+  "/show-3.webp",
+  "/show-4.webp",
+  "/show-5.webp",
+  "/show-6.webp",
+  "/show-7.webp",
+  "/show-8.webp",
+  "/show-9.webp",
+  "/show-10.webp",
+  "/show-11.webp",
+  "/show-12.webp",
+  "/show-13.webp",
+  "/show-14.webp",
 ];
 
 export default function CenteredPeekSlider() {
@@ -168,12 +177,10 @@ export default function CenteredPeekSlider() {
       </div>
 
       {/* Button spaced further down */}
-      <button
-        className="mt-10 bg-high text-ground font-bold py-3 px-6 rounded-lg shadow-lg hover:bg-high/90 transition"
+      <SendJobButton
+        label="Send Print / Designs Now"
         onClick={() => alert("Send Print / Designs Now clicked")}
-      >
-        Send Print / Designs Now
-      </button>
+      />
     </div>
   );
 }
