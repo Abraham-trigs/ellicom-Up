@@ -7,8 +7,9 @@ export default function SameDay({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 595.28 841.89"
-      className={className}
+      // Tight viewBox to remove extra bottom space
+      viewBox="0 200 595 150"
+      className={`w-full max-w-[500px] h-auto ${className}`}
       {...props}
     >
       <defs>
@@ -20,7 +21,6 @@ export default function SameDay({
           y2="0"
           gradientUnits="userSpaceOnUse"
         >
-          {/* Green */}
           <stop offset="5%" stopColor="#27ef46">
             <animate
               attributeName="offset"
@@ -30,7 +30,6 @@ export default function SameDay({
             />
           </stop>
 
-          {/* Cyan */}
           <stop offset="30%" stopColor="#3cc2dd">
             <animate
               attributeName="offset"
@@ -40,7 +39,6 @@ export default function SameDay({
             />
           </stop>
 
-          {/* Light Green */}
           <stop offset="60%" stopColor="#93f179">
             <animate
               attributeName="offset"
@@ -50,7 +48,6 @@ export default function SameDay({
             />
           </stop>
 
-          {/* Blue */}
           <stop offset="90%" stopColor="#1e3cff">
             <animate
               attributeName="offset"
