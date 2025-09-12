@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useJobStore, JobWithUsers } from "@/lib/store/JobStore";
 
 import JobTypeModal from "@/components/job/modals/JobTypeModal";
-import SelectorModal from "@/components/job/modals/SelectorModal";
+import MaterialTypeModal from "./modals/MaterialType";
 import PaperSizeModal from "@/components/job/modals/PaperSizeModal";
 import QuantityModal from "@/components/job/modals/QuantityModal";
 
@@ -191,7 +191,7 @@ export default function JobCard() {
         onClose={() => setQuantityModalOpen(false)}
         onSelect={setQuantity}
       />
-      <SelectorModal
+      <MaterialTypeModal
         open={isMaterialModalOpen}
         onClose={() => setMaterialModalOpen(false)}
         onSelect={setMaterial}

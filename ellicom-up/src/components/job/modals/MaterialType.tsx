@@ -3,69 +3,64 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useJobStore } from "@/lib/store/JobStore";
+import { useJobPricingStore } from "@/lib/store/JobPricingStore";
 
-interface SelectorModalProps {
+interface MaterialTypeModalModalProps {
   open: boolean;
   onClose: () => void;
-  onSelect: (selection: string) => void;
+  onSelect: (material: string) => void;
   jobType: string;
 }
 
 const backdropStyle = `fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50`;
 const modalStyle = `bg-container text-coHead rounded-2xl p-6 w-[90%] max-w-md shadow-2xl border border-sea`;
 
-export default function SelectorModal({
+export default function MaterialTypeModal({
   open,
   onClose,
   onSelect,
   jobType,
-}: SelectorModalProps) {
-  const { jobPricings = [], fetchJobPricings, loading, error } = useJobStore();
+}: MaterialTypeModalModalProps) {
+  const { jobPricingList, fetchJobPricing, isLoading, error } =
+    useJobPricingStore();
+
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // Fetch job pricing when modal opens
   useEffect(() => {
     if (open) {
-      fetchJobPricings?.();
+      fetchJobPricing();
       setTimeout(() => inputRef.current?.focus(), 50);
     } else {
       setSearch("");
       setHighlightIndex(-1);
     }
-  }, [open, fetchJobPricings]);
+  }, [open, fetchJobPricing]);
 
+  // Filter materials for the selected jobType
   const options = useMemo(() => {
     if (!jobType) return [];
-    const filtered = jobPricings.filter((jp) => jp.jobType === jobType);
+    const filtered = jobPricingList.filter((jp) => jp.jobType === jobType);
 
     const seen = new Set<string>();
-    if (jobType === "Designing") {
-      return filtered
-        .map((jp) => jp.variable)
-        .filter((v) => v && !seen.has(v) && seen.add(v))
-        .filter((v) =>
-          search ? v.toLowerCase().includes(search.toLowerCase()) : true
-        );
-    } else {
-      return filtered
-        .map((jp) => jp.materialType)
-        .filter((mat): mat is string => !!mat)
-        .filter((mat) => !seen.has(mat) && seen.add(mat))
-        .filter((mat) =>
-          search ? mat.toLowerCase().includes(search.toLowerCase()) : true
-        );
-    }
-  }, [jobPricings, jobType, search]);
+    return filtered
+      .map((jp) => jp.materialType)
+      .filter((mat): mat is string => !!mat)
+      .filter((mat) => !seen.has(mat) && seen.add(mat))
+      .filter((mat) =>
+        search ? mat.toLowerCase().includes(search.toLowerCase()) : true
+      );
+  }, [jobPricingList, jobType, search]);
 
+  // Highlight first item when options change
   useEffect(() => {
-    if (open) {
-      setHighlightIndex(options.length > 0 ? 0 : -1);
-    }
+    if (open) setHighlightIndex(options.length > 0 ? 0 : -1);
   }, [options, open]);
 
+  // Scroll highlighted item into view
   useEffect(() => {
     if (highlightIndex >= 0 && itemRefs.current[highlightIndex]) {
       itemRefs.current[highlightIndex]?.scrollIntoView({
@@ -77,6 +72,7 @@ export default function SelectorModal({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (options.length === 0) return;
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setHighlightIndex((prev) => (prev < options.length - 1 ? prev + 1 : 0));
@@ -117,7 +113,7 @@ export default function SelectorModal({
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4 text-head text-center">
-              Select {jobType === "Designing" ? "Type" : "Material"}
+              Select Material
             </h2>
 
             <input
@@ -126,13 +122,11 @@ export default function SelectorModal({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={`Search ${
-                jobType === "Designing" ? "types" : "materials"
-              }...`}
+              placeholder="Search materials..."
               className="w-full mb-4 px-3 py-2 border border-sea rounded-lg outline-none focus:ring-2 focus:ring-sea"
             />
 
-            {loading && (
+            {isLoading && (
               <div className="text-center text-sm text-gray-400">
                 Loading...
               </div>
@@ -141,15 +135,15 @@ export default function SelectorModal({
               <div className="text-center text-sm text-red-400">{error}</div>
             )}
 
-            {!loading && !error && (
+            {!isLoading && !error && (
               <div className="max-h-60 overflow-y-auto space-y-2">
                 {options.length > 0 ? (
-                  options.map((option, idx) => (
+                  options.map((mat, idx) => (
                     <button
-                      key={option}
+                      key={mat}
                       ref={(el) => (itemRefs.current[idx] = el)}
                       onClick={() => {
-                        onSelect(option);
+                        onSelect(mat);
                         onClose();
                       }}
                       className={`w-full text-left px-4 py-2 rounded-xl font-semibold transition ${
@@ -158,12 +152,12 @@ export default function SelectorModal({
                           : "bg-sea text-ground hover:bg-high"
                       }`}
                     >
-                      {option}
+                      {mat}
                     </button>
                   ))
                 ) : (
                   <div className="text-center text-sm text-gray-400">
-                    No options found.
+                    No materials found.
                   </div>
                 )}
               </div>

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { JobWithUsers, useJobStore } from "@/lib/store/JobStore";
 import JobTypeModal from "./JobTypeModal";
-import SelectorModal from "./SelectorModal";
+import SelectorModal from "./MaterialType";
 import PaperSizeModal from "./PaperSizeModal";
 import QuantityModal from "./QuantityModal";
 

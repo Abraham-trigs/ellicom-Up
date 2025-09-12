@@ -1,179 +1,133 @@
-// import { create } from "zustand";
-// import { devtools, persist } from "zustand/middleware";
+import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
 
-// // Simple debounce utility
-// function debounce<F extends (...args: any[]) => void>(func: F, wait: number) {
-//   let timeout: ReturnType<typeof setTimeout> | null = null;
-//   return (...args: Parameters<F>) => {
-//     if (timeout) clearTimeout(timeout);
-//     timeout = setTimeout(() => func(...args), wait);
-//   };
-// }
+// Simple debounce utility
+function debounce<F extends (...args: any[]) => void>(func: F, wait: number) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<F>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
+}
 
-// type JobPricing = {
-//   id: string;
-//   jobType: string;
-//   materialType?: string | null;
-//   variable: string;
-//   unitPrice: number;
-//   modifiers: string[];
-//   notes?: string | null;
-//   createdAt: Date;
-//   updatedAt: Date;
-// };
+export type JobPricing = {
+  id: string;
+  jobType: string;
+  materialType?: string | null;
+  variable: string;
+  unitPrice: number;
+  modifiers: string[];
+  notes?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-// type State = {
-//   jobPricingList: JobPricing[];
-//   isLoading: boolean;
-//   error: string | null;
+type State = {
+  jobPricingList: JobPricing[];
+  isLoading: boolean;
+  error: string | null;
 
-//   jobTypes: string[];
+  jobTypes: string[];
 
-//   fetchJobPricing: () => Promise<void>;
-//   addJobPricing: (
-//     data: Omit<JobPricing, "id" | "createdAt" | "updatedAt">
-//   ) => Promise<void>;
-//   updateJobPricing: (
-//     id: string,
-//     data: Partial<JobPricing>
-//   ) => Promise<void>;
-//   deleteJobPricing: (id: string) => Promise<void>;
-// };
+  fetchJobPricing: () => Promise<void>;
+  addJobPricing: (data: Omit<JobPricing, "id" | "createdAt" | "updatedAt">) => Promise<void>;
+  updateJobPricing: (id: string, data: Partial<JobPricing>) => Promise<void>;
+  deleteJobPricing: (id: string) => Promise<void>;
+};
 
-// export const useJobPricingStore = create<State>()(
-//   devtools(
-//     persist(
-//       (set, get) => {
-//         const debouncedFetch = debounce(async () => {
-//           const currentData = get().jobPricingList;
-//           const isFirstLoad = currentData.length === 0;
+export const useJobPricingStore = create<State>()(
+  devtools(
+    persist(
+      (set, get) => {
+        const debouncedFetch = debounce(async () => {
+          set({ isLoading: true, error: null });
 
-//           if (isFirstLoad) {
-//             set({ isLoading: true, error: null });
-//           } else {
-//             set({ error: null });
-//           }
+          try {
+            const res = await fetch("/api/jobpricing"); // make sure this matches your API
+            if (!res.ok) throw new Error("Failed to fetch pricing data");
 
-//           try {
-//             const res = await fetch("/api/job-pricing");
-//             if (!res.ok) throw new Error("Failed to fetch pricing data");
+            const freshDataRaw: JobPricing[] = await res.json();
+            const freshData = freshDataRaw.map(item => ({
+              ...item,
+              createdAt: new Date(item.createdAt),
+              updatedAt: new Date(item.updatedAt),
+            }));
 
-//             const freshDataRaw: JobPricing[] = await res.json();
+            set({ jobPricingList: freshData, isLoading: false });
+          } catch (err) {
+            set({ error: "Failed to fetch pricing data", isLoading: false });
+          }
+        }, 300);
 
-//             // Convert string dates to Date objects
-//             const freshData = freshDataRaw.map((item) => ({
-//               ...item,
-//               createdAt: new Date(item.createdAt),
-//               updatedAt: new Date(item.updatedAt),
-//             }));
+        return {
+          jobPricingList: [],
+          isLoading: false,
+          error: null,
 
-//             const isDifferent =
-//               JSON.stringify(freshData) !== JSON.stringify(get().jobPricingList);
+          get jobTypes() {
+            // return all job types in DB, no duplicates
+            return Array.from(new Set(get().jobPricingList.map(j => j.jobType?.trim()).filter(Boolean)));
+          },
 
-//             if (isDifferent) {
-//               set({ jobPricingList: freshData });
-//             }
-//           } catch (err: any) {
-//             set({ error: "Failed to fetch pricing data" });
-//           } finally {
-//             set({ isLoading: false });
-//           }
-//         }, 500);
+          fetchJobPricing: async () => {
+            debouncedFetch();
+          },
 
-//         return {
-//           jobPricingList: [],
-//           isLoading: false,
-//           error: null,
+          addJobPricing: async (payload) => {
+            set({ isLoading: true, error: null });
+            try {
+              const res = await fetch("/api/jobpricing", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!res.ok) throw new Error("Failed to add pricing");
 
-//           get jobTypes() {
-//             return Array.from(new Set(get().jobPricingList.map((j) => j.jobType)));
-//           },
+              const newEntryRaw = await res.json();
+              const newEntry = { ...newEntryRaw, createdAt: new Date(newEntryRaw.createdAt), updatedAt: new Date(newEntryRaw.updatedAt) };
 
-//           fetchJobPricing: async () => {
-//             debouncedFetch();
-//           },
+              set(state => ({ jobPricingList: [newEntry, ...state.jobPricingList], isLoading: false }));
+            } catch (err) {
+              set({ error: "Failed to add pricing", isLoading: false });
+            }
+          },
 
-//           addJobPricing: async (payload) => {
-//             set({ isLoading: true, error: null });
-//             try {
-//               const res = await fetch("/api/job-pricing", {
-//                 method: "POST",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify(payload),
-//               });
-//               if (!res.ok) throw new Error("Failed to add pricing");
-//               const newEntryRaw = await res.json();
+          updateJobPricing: async (id, payload) => {
+            set({ isLoading: true, error: null });
+            try {
+              const res = await fetch(`/api/jobpricing/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+              if (!res.ok) throw new Error("Failed to update pricing");
 
-//               // Convert new entry dates to Date objects
-//               const newEntry = {
-//                 ...newEntryRaw,
-//                 createdAt: new Date(newEntryRaw.createdAt),
-//                 updatedAt: new Date(newEntryRaw.updatedAt),
-//               };
+              const updatedRaw = await res.json();
+              const updated = { ...updatedRaw, createdAt: new Date(updatedRaw.createdAt), updatedAt: new Date(updatedRaw.updatedAt) };
 
-//               set((state) => ({
-//                 jobPricingList: [newEntry, ...state.jobPricingList],
-//                 isLoading: false,
-//               }));
-//             } catch (err) {
-//               set({ error: "Failed to add pricing", isLoading: false });
-//             }
-//           },
+              set(state => ({
+                jobPricingList: state.jobPricingList.map(item => item.id === id ? updated : item),
+                isLoading: false,
+              }));
+            } catch (err) {
+              set({ error: "Failed to update pricing", isLoading: false });
+            }
+          },
 
-//           updateJobPricing: async (id, payload) => {
-//             set({ isLoading: true, error: null });
-//             try {
-//               const res = await fetch(`/api/job-pricing/${id}`, {
-//                 method: "PATCH",
-//                 headers: { "Content-Type": "application/json" },
-//                 body: JSON.stringify(payload),
-//               });
-//               if (!res.ok) throw new Error("Failed to update pricing");
-//               const updatedRaw = await res.json();
+          deleteJobPricing: async (id) => {
+            set({ isLoading: true, error: null });
+            try {
+              const res = await fetch(`/api/jobpricing/${id}`, { method: "DELETE" });
+              if (!res.ok) throw new Error("Failed to delete pricing");
 
-//               // Convert updated entry dates to Date objects
-//               const updated = {
-//                 ...updatedRaw,
-//                 createdAt: new Date(updatedRaw.createdAt),
-//                 updatedAt: new Date(updatedRaw.updatedAt),
-//               };
-
-//               set((state) => ({
-//                 jobPricingList: state.jobPricingList.map((item) =>
-//                   item.id === id ? updated : item
-//                 ),
-//                 isLoading: false,
-//               }));
-//             } catch (err) {
-//               set({ error: "Failed to update pricing", isLoading: false });
-//             }
-//           },
-
-//           deleteJobPricing: async (id) => {
-//             set({ isLoading: true, error: null });
-//             try {
-//               const res = await fetch(`/api/job-pricing/${id}`, {
-//                 method: "DELETE",
-//               });
-//               if (!res.ok) throw new Error("Failed to delete pricing");
-//               set((state) => ({
-//                 jobPricingList: state.jobPricingList.filter(
-//                   (item) => item.id !== id
-//                 ),
-//                 isLoading: false,
-//               }));
-//             } catch (err) {
-//               set({ error: "Failed to delete pricing", isLoading: false });
-//             }
-//           },
-//         };
-//       },
-//       {
-//         name: "jobPricingStore",
-//         partialize: (state) => ({
-//           jobPricingList: state.jobPricingList,
-//         }),
-//       }
-//     )
-//   )
-// );
+              set(state => ({ jobPricingList: state.jobPricingList.filter(item => item.id !== id), isLoading: false }));
+            } catch (err) {
+              set({ error: "Failed to delete pricing", isLoading: false });
+            }
+          },
+        };
+      },
+      { name: "jobPricingStore", partialize: (state) => ({ jobPricingList: state.jobPricingList }) }
+    )
+  )
+);

@@ -4,6 +4,7 @@ import Navbar from "@/components/home/Navbar";
 import TagAndSlider from "@/components/home/TagAndSlider";
 import ImageDisplay from "@/components/home/ImageDisplay";
 import SendJobButton from "@/components/SendJobButton";
+import ServiceGrid from "@/components/home/ServiceGrid";
 
 export default function Home() {
   const bannerImages = [
@@ -39,6 +40,7 @@ export default function Home() {
             onClick={() => alert("Send Print / Designs Now clicked")}
           />
         </div>
+        <ServiceGrid />
       </main>
     </>
   );

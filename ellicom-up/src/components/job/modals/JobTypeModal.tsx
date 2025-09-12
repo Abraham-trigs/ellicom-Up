@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useJobStore } from "@/lib/store/JobStore";
+import { useJobPricingStore } from "@/lib/store/JobPricingStore";
 
 interface JobTypeModalProps {
   open: boolean;
@@ -19,26 +19,26 @@ export default function JobTypeModal({
   onClose,
   onSelect,
 }: JobTypeModalProps) {
-  const { jobPricings, fetchJobPricings, loading, error } = useJobStore();
+  const { jobPricingList, fetchJobPricing, isLoading, error } =
+    useJobPricingStore();
   const [search, setSearch] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(-1);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Deduplicate job types
+  // Use all job types from the store, only remove exact duplicates
   const uniqueJobTypes = useMemo(() => {
     const seen = new Set<string>();
-    return (jobPricings || [])
-      .map((item) => item.jobType)
-      .filter((type) => {
+    return jobPricingList
+      .map((item) => item.jobType?.trim())
+      .filter((type): type is string => {
         if (!type) return false;
         if (seen.has(type)) return false;
         seen.add(type);
         return true;
-      })
-      .sort();
-  }, [jobPricings]);
+      });
+  }, [jobPricingList]);
 
   const filteredJobTypes = useMemo(
     () =>
@@ -48,12 +48,12 @@ export default function JobTypeModal({
     [uniqueJobTypes, search]
   );
 
-  // Fetch job pricings when modal opens
+  // Fetch job pricing once when modal opens
   useEffect(() => {
     if (!open) return;
-    fetchJobPricings();
+    fetchJobPricing();
     setTimeout(() => inputRef.current?.focus(), 50);
-  }, [open, fetchJobPricings]);
+  }, [open]);
 
   // Highlight first item when list changes
   useEffect(() => {
@@ -132,7 +132,7 @@ export default function JobTypeModal({
               className="w-full mb-4 px-3 py-2 border border-sea rounded-lg outline-none focus:ring-2 focus:ring-sea"
             />
 
-            {loading && (
+            {isLoading && (
               <div className="text-center text-sm text-gray-400">
                 Loading...
               </div>
@@ -141,7 +141,7 @@ export default function JobTypeModal({
               <div className="text-center text-sm text-red-400">{error}</div>
             )}
 
-            {!loading && !error && (
+            {!isLoading && !error && (
               <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
                 {filteredJobTypes.length > 0 ? (
                   filteredJobTypes.map((type, index) => (
