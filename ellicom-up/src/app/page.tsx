@@ -31,16 +31,19 @@ export default function Home() {
         {/* 🆕 Clean, reusable Tag & Slider block */}
         <TagAndSlider />
 
-        <h1 className="text-4xl font-bold my-6 text-gold dark:text-head">
+        {/* <h1 className="text-4xl font-bold my-6 text-gold dark:text-head">
           Welcome to Ellicom Hub
-        </h1>
+        </h1> */}
 
-        <p className="mb-4 text-sea dark:text-textSecondary">
+        {/* <p className="mb-4 text-sea dark:text-textSecondary">
           Let’s build it right, one pixel at a time.
-        </p>
+        </p> */}
 
         {/* Other content */}
-        <SameDay />
+        <div className="-mt-[1400px] scale-[0.23]   transform">
+          <SameDay />
+        </div>
+
         <ImageDisplay images={bannerImages} alt="Ellicom Hub Banner" />
       </main>
       {/* </AuthGuard> */}
