@@ -2,7 +2,7 @@ export default function BackgroundVideo({ src, poster }) {
   return (
     <div
       className="
-        fixed
+        relative
         top-0
         left-0
         w-full
