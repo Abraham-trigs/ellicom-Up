@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
-import { useJobStore } from "@/lib/store/JobStore";
+import React, { useMemo } from "react";
+import { useJobStore, JobWithUsers } from "@/lib/store/JobStore";
 
 import JobTypeModal from "@/components/job/modals/JobTypeModal";
+import SelectorModal from "@/components/job/modals/SelectorModal";
 import PaperSizeModal from "@/components/job/modals/PaperSizeModal";
 import QuantityModal from "@/components/job/modals/QuantityModal";
-import SelectorModal from "@/components/job/modals/SelectorModal";
 
 export default function JobCard() {
   const { currentJob, setCurrentJob, saveCurrentJob, getJobOptions } =
@@ -17,11 +17,11 @@ export default function JobCard() {
   const [isQuantityModalOpen, setQuantityModalOpen] = React.useState(false);
   const [isMaterialModalOpen, setMaterialModalOpen] = React.useState(false);
 
-  // fetch available options for this job type (from JobPricing in store)
   const { colorOptions = [], sideOptions = [] } =
     getJobOptions?.(currentJob?.jobType) || {};
 
-  const updateJob = (field: keyof typeof currentJob, value: any) => {
+  const updateJob = (field: keyof JobWithUsers, value: any) => {
+    if (!currentJob) return;
     setCurrentJob({ ...currentJob, [field]: value });
   };
 
@@ -30,7 +30,6 @@ export default function JobCard() {
   const setPaperSize = (size: string) => updateJob("paperSize", size);
   const setQuantity = (qty: number) => updateJob("quantity", qty);
   const setColorType = (type: string) => updateJob("colorType", type);
-
   const toggleSideType = () => {
     if (!sideOptions.length) return;
     const currentIndex = sideOptions.indexOf(currentJob?.sideType || "");
@@ -39,11 +38,6 @@ export default function JobCard() {
   };
 
   const isJobSelected = Boolean(currentJob?.jobType);
-
-  const handleSaveOrder = () => {
-    if (!isJobSelected) return;
-    saveCurrentJob();
-  };
 
   return (
     <>
@@ -102,7 +96,6 @@ export default function JobCard() {
 
             {/* Color & Side */}
             <div className="flex-1 min-w-[220px] flex flex-col items-center bg-high p-3 rounded-2xl shadow-md">
-              {/* Dynamic Colors */}
               <div className="flex gap-2 mb-2">
                 {(colorOptions.length > 0
                   ? colorOptions
@@ -110,7 +103,6 @@ export default function JobCard() {
                 ).map((type) => {
                   const isActive =
                     colorOptions.length > 0 && currentJob?.colorType === type;
-
                   return (
                     <div
                       key={type}
@@ -118,13 +110,13 @@ export default function JobCard() {
                         colorOptions.length > 0 && setColorType(type)
                       }
                       className={`w-16 h-8 text-sm rounded-md flex items-center justify-center font-semibold 
-                          ${
-                            colorOptions.length === 0
-                              ? "bg-inactive text-ground opacity-50 cursor-not-allowed"
-                              : isActive
-                              ? "bg-green-500 text-container"
-                              : "bg-coHead text-ground cursor-pointer"
-                          }`}
+                        ${
+                          colorOptions.length === 0
+                            ? "bg-inactive text-ground opacity-50 cursor-not-allowed"
+                            : isActive
+                            ? "bg-green-500 text-container"
+                            : "bg-coHead text-ground cursor-pointer"
+                        }`}
                     >
                       {type}
                     </div>
@@ -132,7 +124,6 @@ export default function JobCard() {
                 })}
               </div>
 
-              {/* Dynamic Side Options */}
               <div className="flex gap-2">
                 {(sideOptions.length > 0
                   ? sideOptions
@@ -140,7 +131,6 @@ export default function JobCard() {
                 ).map((side) => {
                   const isActive =
                     sideOptions.length > 0 && currentJob?.sideType === side;
-
                   return (
                     <div
                       key={side}
@@ -161,7 +151,6 @@ export default function JobCard() {
                   );
                 })}
 
-                {/* File status */}
                 <div
                   className={`w-16 h-8 rounded-md flex items-center justify-center font-bold text-sm ${
                     currentJob?.fileAttached
@@ -175,10 +164,9 @@ export default function JobCard() {
             </div>
           </div>
 
-          {/* Save */}
           <div className="w-full flex justify-center">
             <button
-              onClick={handleSaveOrder}
+              onClick={() => currentJob && saveCurrentJob()}
               className="bg-coHead hover:bg-high hover:text-container text-container px-6 py-2 font-bold rounded-md shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!isJobSelected}
             >
@@ -188,7 +176,6 @@ export default function JobCard() {
         </div>
       </div>
 
-      {/* Modals */}
       <JobTypeModal
         open={isJobTypeModalOpen}
         onClose={() => setJobTypeModalOpen(false)}
@@ -208,7 +195,7 @@ export default function JobCard() {
         open={isMaterialModalOpen}
         onClose={() => setMaterialModalOpen(false)}
         onSelect={setMaterial}
-        jobType={currentJob?.jobType || ""}
+        jobType={currentJob?.jobType}
       />
     </>
   );

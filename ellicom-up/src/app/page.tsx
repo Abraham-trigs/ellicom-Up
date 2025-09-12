@@ -5,6 +5,7 @@ import BackgroundVideo from "@/components/home/background-video";
 
 // 🆕 Grouped Tag & Slider import
 import TagAndSlider from "@/components/home/TagAndSlider";
+import SameDay from "@/components/home/sameday/sameday";
 
 export default function Home() {
   const bannerImages = [
@@ -39,6 +40,7 @@ export default function Home() {
         </p>
 
         {/* Other content */}
+        <SameDay />
         <ImageDisplay images={bannerImages} alt="Ellicom Hub Banner" />
       </main>
       {/* </AuthGuard> */}

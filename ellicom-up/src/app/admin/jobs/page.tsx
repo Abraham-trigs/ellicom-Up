@@ -32,7 +32,7 @@ export default function JobsPage() {
   };
 
   return (
-    <div className="p-4 bg-ground dark:bg-surface text-head dark:text-textPrimary min-h-screen">
+    <div className="p-4 dark:bg-surface text-head dark:text-textPrimary min-h-screen">
       <h1 className="text-xl font-bold mb-6">Jobs</h1>
 
       {/* Status Tabs */}

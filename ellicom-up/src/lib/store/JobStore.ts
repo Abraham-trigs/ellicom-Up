@@ -18,14 +18,14 @@ export interface JobPricing {
   unitPrice: number;
   modifiers?: string[];
   notes?: string;
-  colorOptions?: string[]; // ["Color", "Black"]
-  sideOptions?: string[]; // ["Front", "Front & Back"]
+  colorOptions?: string[];
+  sideOptions?: string[];
 }
 
 export interface JobWithUsers {
   id: string;
   jobType: string;
-  materialType?: string;
+  material?: string;
   paperSize?: string;
   quantity?: number;
   colorType?: string;
@@ -35,6 +35,7 @@ export interface JobWithUsers {
   fileAttached?: boolean;
   details?: string;
   unitPrice?: number;
+  totalPrice?: number;
 }
 
 interface JobStore {
@@ -49,13 +50,13 @@ interface JobStore {
   fetchJobPricings: () => Promise<void>;
 
   saveCurrentJob: () => void;
+  updateJob: (jobId: string, updatedData: Partial<JobWithUsers>) => void;
   startNewJob: () => void;
   editJob: (jobId: string) => void;
   cancelEdit: () => void;
   resetCurrentJob: () => void;
   clearSavedJobs: () => void;
 
-  // ✅ new
   getJobOptions: (
     jobType?: string
   ) =>
@@ -72,7 +73,7 @@ export const useJobStore = create<JobStore>()(
       currentJob: {
         id: crypto.randomUUID(),
         jobType: "",
-        materialType: undefined,
+        material: undefined,
         paperSize: undefined,
         quantity: undefined,
         colorType: "Color",
@@ -82,52 +83,55 @@ export const useJobStore = create<JobStore>()(
         fileAttached: false,
         details: "",
         unitPrice: 0,
+        totalPrice: 0,
       },
       savedJobs: [],
       jobPricings: [],
       loading: false,
       error: undefined,
 
-    setCurrentJob: (job) => {
-      let price = 0;
-      let colorOptions: string[] = [];
-      let sideOptions: string[] = [];
+      setCurrentJob: (job) => {
+        let price = 0;
+        let colorOptions: string[] = [];
+        let sideOptions: string[] = [];
 
-      if (job.jobType && job.materialType) {
-        const pricing = get().jobPricings.find(
-          (p) =>
-            p.jobType === job.jobType &&
-            p.variable.toLowerCase() === job.materialType?.toLowerCase()
-        );
+        if (job.jobType && job.material) {
+          const pricing = get().jobPricings.find(
+            (p) =>
+              p.jobType === job.jobType &&
+              p.variable.toLowerCase() === job.material?.toLowerCase()
+          );
 
-        if (pricing) {
-          price = pricing.unitPrice;
-          colorOptions = pricing.colorOptions || [];
-          sideOptions = pricing.sideOptions || [];
+          if (pricing) {
+            price = pricing.unitPrice;
+            colorOptions = pricing.colorOptions || [];
+            sideOptions = pricing.sideOptions || [];
+          }
         }
-      }
 
-      // Keep previous selection if still valid
-      const colorType =
-        job.colorType && colorOptions.includes(job.colorType)
-          ? job.colorType
-          : colorOptions[0]; // ✅ will be undefined if no options
-      const sideType =
-        job.sideType && sideOptions.includes(job.sideType)
-          ? job.sideType
-          : sideOptions[0]; // ✅ same here
+        const colorType =
+          job.colorType && colorOptions.includes(job.colorType)
+            ? job.colorType
+            : colorOptions[0];
+        const sideType =
+          job.sideType && sideOptions.includes(job.sideType)
+            ? job.sideType
+            : sideOptions[0];
 
-      set({
-        currentJob: {
-          ...job,
-          unitPrice: price,
-          colorOptions,
-          sideOptions,
-          colorType,
-          sideType,
-        },
-      });
-    },
+        const totalPrice = price * (job.quantity || 1);
+
+        set({
+          currentJob: {
+            ...job,
+            unitPrice: price,
+            totalPrice,
+            colorOptions,
+            sideOptions,
+            colorType,
+            sideType,
+          },
+        });
+      },
 
       setJobPricings: (pricing) => set({ jobPricings: pricing }),
 
@@ -147,25 +151,6 @@ export const useJobStore = create<JobStore>()(
         }
       },
 
-      startNewJob: () => {
-        set({
-          currentJob: {
-            id: crypto.randomUUID(),
-            jobType: "",
-            materialType: undefined,
-            paperSize: undefined,
-            quantity: undefined,
-            colorType: "Color",
-            sideType: "Front",
-            colorOptions: ["Color", "Black"],
-            sideOptions: ["Front", "Front & Back"],
-            fileAttached: false,
-            details: "",
-            unitPrice: 0,
-          },
-        });
-      },
-
       saveCurrentJob: () => {
         const job = get().currentJob;
         if (!job?.jobType) return;
@@ -180,6 +165,44 @@ export const useJobStore = create<JobStore>()(
         }
       },
 
+      updateJob: (jobId, updatedData) => {
+        const updatedJobs = get().savedJobs.map((job) => {
+          if (job.id === jobId) {
+            const updatedJob = { ...job, ...updatedData };
+            const pricing = get().jobPricings.find(
+              (p) =>
+                p.jobType === updatedJob.jobType &&
+                p.variable.toLowerCase() === (updatedJob.material || "").toLowerCase()
+            );
+            const unitPrice = pricing?.unitPrice || 0;
+            const totalPrice = unitPrice * (updatedJob.quantity || 1);
+            return { ...updatedJob, unitPrice, totalPrice };
+          }
+          return job;
+        });
+        set({ savedJobs: updatedJobs });
+      },
+
+      startNewJob: () => {
+        set({
+          currentJob: {
+            id: crypto.randomUUID(),
+            jobType: "",
+            material: undefined,
+            paperSize: undefined,
+            quantity: undefined,
+            colorType: "Color",
+            sideType: "Front",
+            colorOptions: ["Color", "Black"],
+            sideOptions: ["Front", "Front & Back"],
+            fileAttached: false,
+            details: "",
+            unitPrice: 0,
+            totalPrice: 0,
+          },
+        });
+      },
+
       editJob: (jobId: string) => {
         const jobToEdit = get().savedJobs.find((j) => j.id === jobId);
         if (jobToEdit) set({ currentJob: { ...jobToEdit } });
@@ -192,7 +215,7 @@ export const useJobStore = create<JobStore>()(
           currentJob: {
             id: crypto.randomUUID(),
             jobType: "",
-            materialType: undefined,
+            material: undefined,
             paperSize: undefined,
             quantity: undefined,
             colorType: "Color",
@@ -202,13 +225,13 @@ export const useJobStore = create<JobStore>()(
             fileAttached: false,
             details: "",
             unitPrice: 0,
+            totalPrice: 0,
           },
         });
       },
 
       clearSavedJobs: () => set({ savedJobs: [] }),
 
-      // ✅ Implementation for JobCard
       getJobOptions: (jobType?: string) => {
         if (!jobType) return null;
         const pricing = get().jobPricings.find((p) => p.jobType === jobType);
