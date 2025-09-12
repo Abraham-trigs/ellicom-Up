@@ -17,20 +17,17 @@ export default function ImageDisplay({
   images,
 }: ImageDisplayProps) {
   const largestImage = images[images.length - 1];
-  const sizes = "100vw";
 
   return (
-    <section className="relative w-screen -mx-8 sm:-mx-8 md:-mx-8 lg:-mx-8 xl:-mx-8 2xl:-mx-8">
-      <div className="relative w-full h-64 sm:h-96 md:h-[400px] lg:h-[500px] xl:h-[600px] 2xl:h-[700px]">
-        <Image
-          src={largestImage.src}
-          alt={alt}
-          fill
-          priority
-          sizes={sizes}
-          className="object-cover"
-        />
-      </div>
+    <section className="relative w-full flex justify-center">
+      <Image
+        src={largestImage.src}
+        alt={alt}
+        width={largestImage.width} // natural width
+        height={largestImage.width / 2} // or use actual image ratio
+        className="object-contain"
+        priority
+      />
     </section>
   );
 }
