@@ -5,6 +5,7 @@ import TagAndSlider from "@/components/home/TagAndSlider";
 import ImageDisplay from "@/components/home/ImageDisplay";
 import SendJobButton from "@/components/SendJobButton";
 import ServiceGrid from "@/components/home/ServiceGrid";
+import TextilePrintingSVG from "@/components/home/TextilePrinting/TextilePrnting";
 
 export default function Home() {
   const bannerImages = [
@@ -48,8 +49,49 @@ export default function Home() {
             onClick={() => alert("Send Print / Designs Now clicked")}
           />
         </div>
-        <ImageDisplay images={clothImages} alt="Cloth Banner" />
-        <ServiceGrid />
+
+        <div
+          className="flex flex-col md:flex-row items-center justify-center 
+                max-w-6xl mx-auto px-4 gap-8 md:gap-12 lg:gap-16"
+        >
+          {/* Text Section */}
+          <div className="flex-1 flex justify-center">
+            <div className="max-w-2xl text-center md:text-left">
+              <TextilePrintingSVG />
+
+              <p className="mt-4 text-lg text-textSecondary">
+                Our{" "}
+                <span className="text-head font-bold">Textile Printing</span>{" "}
+                service brings your designs to life on a wide variety of
+                fabrics. Whether it’s soft cotton for t-shirts, durable
+                polyester for sportswear, elegant silk for fashion pieces, or
+                sturdy canvas for banners and tote bags, we ensure vibrant,
+                long-lasting prints. We also work with blends, linen, jersey,
+                and microfiber, giving you the flexibility to create uniforms,
+                branded apparel, promotional items, or custom fashion pieces
+                with unmatched quality and color accuracy.
+              </p>
+
+              <p className="mt-2 text-lg text-textSecondary">
+                We serve schools looking for uniforms and branded wear, churches
+                in need of choir robes or event banners, businesses requiring
+                staff shirts and promotional textiles, as well as fashion
+                designers and individuals seeking unique, customized prints for
+                personal use.
+              </p>
+            </div>
+          </div>
+
+          {/* Image Section */}
+          <div className="flex-1 flex justify-center">
+            <div className="max-w-xl">
+              <ImageDisplay images={clothImages} alt="Cloth Banner" />
+            </div>
+          </div>
+        </div>
+        <div className="">
+          <ServiceGrid />
+        </div>
       </main>
     </>
   );

@@ -19,7 +19,7 @@ export default function ImageDisplay({
   const largestImage = images[images.length - 1];
 
   return (
-    <section className="relative w-full flex justify-center">
+    <section className="relative w-full flex justify-center m-0">
       <Image
         src={largestImage.src}
         alt={alt}
