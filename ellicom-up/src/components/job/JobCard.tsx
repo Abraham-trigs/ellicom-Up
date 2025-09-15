@@ -73,7 +73,16 @@ export default function JobCard() {
               </div>
 
               <div className="flex flex-col gap-2 justify-center">
-                <div className="w-24 h-8 rounded-md bg-ground text-coHead flex justify-center items-center text-sm font-semibold">
+                <div
+                  onClick={
+                    isJobSelected
+                      ? () => setPaperSizeModalOpen(true)
+                      : undefined
+                  }
+                  className={`w-24 h-8 rounded-md bg-ground text-coHead flex justify-center items-center text-sm font-semibold cursor-pointer ${
+                    !isJobSelected && "opacity-50 cursor-not-allowed"
+                  }`}
+                >
                   {currentJob?.paperSize || "Size"}
                 </div>
 
@@ -185,6 +194,8 @@ export default function JobCard() {
         open={isPaperSizeModalOpen}
         onClose={() => setPaperSizeModalOpen(false)}
         onSelect={setPaperSize}
+        jobType={currentJob?.jobType}
+        materialType={currentJob?.material} // ← must pass materialType
       />
       <QuantityModal
         open={isQuantityModalOpen}

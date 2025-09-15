@@ -15,6 +15,14 @@ export default function Home() {
     // { src: "/largeformat-2560.webp", width: 2560 },
   ];
 
+  const clothImages = [
+    { src: "/cloth-640.webp", width: 640 },
+    { src: "/cloth-1024.webp", width: 1024 },
+    { src: "/cloth-1440.webp", width: 1440 },
+    // { src: "/cloth-1920.webp", width: 1920 },
+    // { src: "/cloth-2560.webp", width: 2560 },
+  ];
+
   return (
     <>
       <Navbar />
@@ -40,6 +48,7 @@ export default function Home() {
             onClick={() => alert("Send Print / Designs Now clicked")}
           />
         </div>
+        <ImageDisplay images={clothImages} alt="Cloth Banner" />
         <ServiceGrid />
       </main>
     </>
