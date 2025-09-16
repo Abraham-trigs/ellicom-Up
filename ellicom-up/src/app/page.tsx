@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import Navbar from "@/components/home/Navbar";
 import TagAndSlider from "@/components/home/TagAndSlider";
 import ImageDisplay from "@/components/home/ImageDisplay";
@@ -11,34 +12,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import DigitalPrintingImage from "@/components/home/DigitalPrinting/DigitalPrintingImages";
 import DTFImageDisplay from "@/components/home/DtfPrinting/DTFImageDisplay";
-import footer from "@/components/home/contact";
 
 export default function Home() {
   const bannerImages = [
     { src: "/largeformat-640.webp", width: 640 },
     { src: "/largeformat-1024.webp", width: 1024 },
     { src: "/largeformat-1440.webp", width: 1440 },
-    // { src: "/largeformat-1920.webp", width: 1920 },
-    // { src: "/largeformat-2560.webp", width: 2560 },
   ];
 
   const clothImages = [
     { src: "/cloth-640.webp", width: 640 },
     { src: "/cloth-1024.webp", width: 1024 },
     { src: "/cloth-1440.webp", width: 1440 },
-    // { src: "/cloth-1920.webp", width: 1920 },
-    // { src: "/cloth-2560.webp", width: 2560 },
   ];
 
   const dtfCollections = ["/dtf-1040.webp", "/dtf-1-1040.webp"];
-
-  // const digitalPrinting = [
-  //   { src: "/digital-printing-640.webp", width: 640 },
-  //   { src: "/digital-printing-1024.webp", width: 1024 },
-  //   { src: "/digital-printing-1040.webp", width: 1440 },
-  // ];
-
-  // Add this state & effect near your other hooks
   const [dtfIndex, setDtfIndex] = useState(0);
 
   useEffect(() => {
@@ -46,11 +34,10 @@ export default function Home() {
       setDtfIndex((prev) =>
         prev === dtfCollections.length - 1 ? 0 : prev + 1
       );
-    }, 7000); // every 7 seconds
+    }, 7000);
     return () => clearInterval(interval);
   }, []);
 
-  // const letters = "Large Format Printing".split("");
   const materials = [
     "SAV",
     "Flex Banner",
@@ -86,12 +73,147 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setMaterialIndex((prev) => (prev + 1) % materials.length);
-    }, 5000); // change every 5 seconds
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <>
+      <Head>
+        {/* Basic SEO */}
+        <title>
+          Ellicom Multimedia | Large Format, Textile, DTF & Sticker Printing
+          Services
+        </title>
+        <meta
+          name="description"
+          content="Ellicom Multimedia offers professional Large Format, Textile, DTF, Digital, and Sticker Printing services. Serving businesses, schools, fashion designers, and individuals both locally and remotely."
+        />
+        <meta
+          name="keywords"
+          content="Printing, Large Format, Textile Printing, DTF Printing, Digital Printing, Sticker Printing, Custom Apparel, Banners, Posters, Promotional Items, Vinyl Stickers"
+        />
+        <meta name="robots" content="index, follow" />
+
+        {/* Open Graph / Facebook */}
+        <meta
+          property="og:title"
+          content="Ellicom Multimedia | Printing Services"
+        />
+        <meta
+          property="og:description"
+          content="High-quality Large Format, Textile, DTF, Digital, and Sticker Printing for businesses, schools, and individuals."
+        />
+        <meta property="og:image" content="/og-image.webp" />
+        <meta property="og:url" content="https://www.ellicom.com" />
+        <meta property="og:type" content="website" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+          name="twitter:title"
+          content="Ellicom Multimedia | Printing Services"
+        />
+        <meta
+          name="twitter:description"
+          content="High-quality Large Format, Textile, DTF, Digital, and Sticker Printing for businesses, schools, and individuals."
+        />
+        <meta name="twitter:image" content="/og-image.webp" />
+
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" />
+
+        {/* Structured Data for Physical + Remote operations */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: "Ellicom Multimedia",
+              image: "https://www.ellicom.com/og-image.webp",
+              url: "https://www.ellicom.com",
+              telephone: "+233XXXXXXXXX",
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "Your Street Address",
+                addressLocality: "City",
+                addressRegion: "Region",
+                postalCode: "PostalCode",
+                addressCountry: "GH",
+              },
+              sameAs: [
+                "https://www.facebook.com/ellicom",
+                "https://www.instagram.com/ellicom",
+                "https://twitter.com/ellicom",
+              ],
+              priceRange: "$$",
+              openingHours: "Mo,Tu,We,Th,Fr 08:00-18:00",
+              description:
+                "Ellicom Multimedia offers high-quality Large Format, Textile, DTF, Digital, and Sticker Printing services for businesses, schools, fashion designers, and individuals. We operate both from our physical location and remotely to serve clients worldwide.",
+              makesOffer: [
+                {
+                  "@type": "Offer",
+                  itemOffered: {
+                    "@type": "Product",
+                    name: "Large Format Printing",
+                    description:
+                      "Banners, posters, mesh banners, backlit film, window cling, floor graphics, and aluminum composite panels.",
+                  },
+                },
+                {
+                  "@type": "Offer",
+                  itemOffered: {
+                    "@type": "Product",
+                    name: "Textile Printing",
+                    description:
+                      "Custom apparel including t-shirts, hoodies, uniforms, choir robes, tote bags, canvas prints, and sportswear.",
+                  },
+                },
+                {
+                  "@type": "Offer",
+                  itemOffered: {
+                    "@type": "Product",
+                    name: "DTF Printing",
+                    description:
+                      "Direct-to-Film printing for t-shirts, hoodies, small batch apparel, and custom designs.",
+                  },
+                },
+                {
+                  "@type": "Offer",
+                  itemOffered: {
+                    "@type": "Product",
+                    name: "Sticker Printing",
+                    description:
+                      "Vinyl stickers, die-cut labels, promotional stickers, and custom shapes for indoor and outdoor use.",
+                  },
+                },
+                {
+                  "@type": "Offer",
+                  itemOffered: {
+                    "@type": "Product",
+                    name: "Digital Printing",
+                    description:
+                      "Flyers, brochures, posters, promotional cards, and business stationery.",
+                  },
+                },
+              ],
+              branchOf: {
+                "@type": "Organization",
+                name: "Ellicom Multimedia",
+                url: "https://www.ellicom.com",
+                logo: "https://www.ellicom.com/og-image.webp",
+              },
+              areaServed: {
+                "@type": "Country",
+                name: "Ghana",
+              },
+              additionalType: "https://schema.org/RemoteBusiness",
+            }),
+          }}
+        />
+      </Head>
+
       <Navbar />
 
       <main className="relative z-10 flex flex-col gap-12 min-h-screen p-8 dark:bg-opacity-60 text-sea dark:text-textPrimary transition-colors">

@@ -70,8 +70,6 @@ export default function AnimatedBranding() {
         </button>
       </div>
 
-      <div className="bg-ground"></div>
-
       <style jsx>{`
         @keyframes waveBack {
           0% {
