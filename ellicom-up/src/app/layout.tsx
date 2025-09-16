@@ -1,7 +1,9 @@
+"use client";
 import "./globals.css";
 import ThemeProviderWrapper from "../components/ThemeProviderWrapper";
 import SessionProviderWrapper from "../components/SessionProviderWrapper";
-
+// import Foot from "@/components/home/foot";
+import AnimatedBranding from "@/components/home/AnimatedBranding";
 export default function RootLayout({
   children,
 }: {
@@ -14,6 +16,10 @@ export default function RootLayout({
           <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
         </SessionProviderWrapper>
       </body>
+
+      <footer>
+        <AnimatedBranding />
+      </footer>
     </html>
   );
 }

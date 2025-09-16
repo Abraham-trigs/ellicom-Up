@@ -21,6 +21,8 @@ const config: Config = {
         darkSea: "#04132A",
         power: "#000000",
 
+
+
         /* Dark mode colors — note these are NOT automatically applied, you use them with `dark:` */
         // background: "#1b1b1c",
         // surface: "#252526",
@@ -33,6 +35,26 @@ const config: Config = {
         // hover: "#0a2d3a",
         // focus: "#ffb300",
       },
+// keyframes: {
+//       wave: {
+//         '0%': { transform: 'translateX(0) scaleY(1)' },
+//         '50%': { transform: 'translateX(-25%) scaleY(0.55)' },
+//         '100%': { transform: 'translateX(-50%) scaleY(1)' },
+//       },
+//     },
+//     animation: {
+//       'wave-slow': 'wave 15s linear infinite',
+//       'wave-medium': 'wave 10s linear infinite',
+//       'wave-fast': 'wave 5s linear infinite',
+//     },    
+    
+
+
+
+
+
+
+
     },
   },
   plugins: [require("tailwindcss-animate")],

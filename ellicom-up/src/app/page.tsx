@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import DigitalPrintingImage from "@/components/home/DigitalPrinting/DigitalPrintingImages";
 import DTFImageDisplay from "@/components/home/DtfPrinting/DTFImageDisplay";
+import footer from "@/components/home/contact";
 
 export default function Home() {
   const bannerImages = [
