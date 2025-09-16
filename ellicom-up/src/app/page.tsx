@@ -9,6 +9,8 @@ import TextilePrintingSVG from "@/components/home/TextilePrinting/TextilePrnting
 import DTFsvg from "@/components/home/DtfPrinting/DTFPrinting";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import DigitalPrintingImage from "@/components/home/DigitalPrinting/DigitalPrintingImages";
+import DTFImageDisplay from "@/components/home/DtfPrinting/DTFImageDisplay";
 
 export default function Home() {
   const bannerImages = [
@@ -27,20 +29,13 @@ export default function Home() {
     // { src: "/cloth-2560.webp", width: 2560 },
   ];
 
-  const dtfCollections = [
-    [
-      { src: "/dtf-640.webp", width: 640 },
-      { src: "/dtf-1024.webp", width: 1024 },
-      { src: "/dtf-1440.webp", width: 1440 },
-      // { src: "/cloth-1920.webp", width: 1920 },
-      // { src: "/cloth-2560.webp", width: 2560 },
-    ],
-    [
-      { src: "/dtf-1-640.webp", width: 640 },
-      { src: "/dtf-1-1024.webp", width: 1024 },
-      { src: "/dtf-1-1440.webp", width: 1440 },
-    ],
-  ];
+  const dtfCollections = ["/dtf-1040.webp", "/dtf-1-1040.webp"];
+
+  // const digitalPrinting = [
+  //   { src: "/digital-printing-640.webp", width: 640 },
+  //   { src: "/digital-printing-1024.webp", width: 1024 },
+  //   { src: "/digital-printing-1040.webp", width: 1440 },
+  // ];
 
   // Add this state & effect near your other hooks
   const [dtfIndex, setDtfIndex] = useState(0);
@@ -115,6 +110,7 @@ export default function Home() {
           >
             Large Format Printing
           </motion.h1>
+
           {/* Rotating materials below */}
           <div className="relative h-20 mt-2 flex justify-center">
             <AnimatePresence mode="wait">
@@ -152,7 +148,7 @@ export default function Home() {
           </motion.p>
         </div>
 
-        {/* Section 3: Image below text */}
+        {/* TEXTILE PRINTING*/}
         <ImageDisplay
           images={bannerImages}
           alt="Large Format Printing Banner"
@@ -209,10 +205,7 @@ export default function Home() {
           {/* Image Section (Left) */}
           <div className="flex-1 flex justify-center">
             <div className="max-w-xl bg-high rounded-md p-4">
-              <ImageDisplay
-                images={dtfCollections[dtfIndex]}
-                alt="DTF Banner"
-              />
+              <DTFImageDisplay images={dtfCollections} alt="DTF Banner" />
             </div>
           </div>
 
@@ -234,6 +227,13 @@ export default function Home() {
                 seeking custom apparel with unique designs that stand out.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* DIGITAL PRINTING */}
+        <div className="bg-sea hover:bg-gold w-full">
+          <div className="mx-auto max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
+            <DigitalPrintingImage />
           </div>
         </div>
 
