@@ -14,3 +14,19 @@ body {
 .dark body {
   background-color: #000321; /* your dark background */
 }
+
+/* Neon glow shadow */
+.shadow-neon-glow {
+  box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ff6347, 0 0 40px #ff6347;
+  transition: box-shadow 1s ease-in-out;
+}
+
+/* Optional: animate the glow color */
+@keyframes neonGlow {
+  0%, 100% { box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700; }
+  50% { box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+}
+
+.shadow-animated {
+  animation: neonGlow 3s infinite alternate;
+}

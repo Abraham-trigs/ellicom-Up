@@ -6,6 +6,9 @@ import ImageDisplay from "@/components/home/ImageDisplay";
 import SendJobButton from "@/components/SendJobButton";
 import ServiceGrid from "@/components/home/ServiceGrid";
 import TextilePrintingSVG from "@/components/home/TextilePrinting/TextilePrnting";
+import DTFsvg from "@/components/home/DtfPrinting/DTFPrinting";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const bannerImages = [
@@ -24,6 +27,73 @@ export default function Home() {
     // { src: "/cloth-2560.webp", width: 2560 },
   ];
 
+  const dtfCollections = [
+    [
+      { src: "/dtf-640.webp", width: 640 },
+      { src: "/dtf-1024.webp", width: 1024 },
+      { src: "/dtf-1440.webp", width: 1440 },
+      // { src: "/cloth-1920.webp", width: 1920 },
+      // { src: "/cloth-2560.webp", width: 2560 },
+    ],
+    [
+      { src: "/dtf-1-640.webp", width: 640 },
+      { src: "/dtf-1-1024.webp", width: 1024 },
+      { src: "/dtf-1-1440.webp", width: 1440 },
+    ],
+  ];
+
+  // Add this state & effect near your other hooks
+  const [dtfIndex, setDtfIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDtfIndex((prev) =>
+        prev === dtfCollections.length - 1 ? 0 : prev + 1
+      );
+    }, 7000); // every 7 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  // const letters = "Large Format Printing".split("");
+  const materials = [
+    "SAV",
+    "Flex Banner",
+    "Blockout Flex",
+    "Mesh Banner",
+    "One Way Vision Vinyl",
+    "Transparent Film",
+    "Backlit Film",
+    "Poster Paper",
+    "Photo Paper",
+    "Canvas",
+    "Polyester Fabric",
+    "Textile Banner",
+    "Foam Board",
+    "Acrylic",
+    "Aluminum Composite Panel",
+    "Correx",
+    "Magnetic Sheet",
+    "Window Cling",
+    "Wall Paper",
+    "Floor Graphics Vinyl",
+    "Reflective Vinyl",
+    "Glow in the Dark Vinyl",
+    "Heat Transfer Vinyl",
+    "Lightbox Fabric",
+    "Outdoor Heavy-Duty Flex",
+    "Polypropylene Film",
+    "PVC Sheets",
+  ];
+
+  const [materialIndex, setMaterialIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMaterialIndex((prev) => (prev + 1) % materials.length);
+    }, 5000); // change every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -34,8 +104,52 @@ export default function Home() {
 
         {/* Section 2: Content below SameDay */}
         <div className="-mt-20 flex flex-col items-center gap-4 text-center">
-          <h1 className="font-bold text-5xl">Large Format Printing</h1>
-          <p className="text-gold text-5xl">All sizes Available</p>
+          <motion.h1
+            className="font-bold text-5xl"
+            animate={{ color: ["#e5e5e5", "#ffd700", "#e5e5e5"] }} // textPrimary -> gold -> textPrimary
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              repeatType: "loop",
+            }}
+          >
+            Large Format Printing
+          </motion.h1>
+          {/* Rotating materials below */}
+          <div className="relative h-20 mt-2 flex justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={materials[materialIndex]}
+                className="inline-block  bg-sea rounded-md px-4 py-4"
+                initial={{ width: 0, opacity: 0, scale: 0.8 }}
+                animate={{ width: "auto", opacity: 1, scale: 1 }}
+                exit={{ width: 0, opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              >
+                <motion.p
+                  className="text-ground text-3xl font-bold whitespace-nowrap"
+                  initial={{ x: 50, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -50, opacity: 0 }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                >
+                  {materials[materialIndex]}
+                </motion.p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <motion.p
+            className="text-gold text-2xl font-bold"
+            animate={{ opacity: [1, 0, 1] }} // fade out and back in
+            transition={{
+              duration: 1, // 1 second for one blink cycle
+              repeat: Infinity,
+              repeatType: "loop",
+            }}
+          >
+            Available Now
+          </motion.p>
         </div>
 
         {/* Section 3: Image below text */}
@@ -89,6 +203,40 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* DTF SECTION  */}
+        <div className="flex flex-col md:flex-row items-center justify-center max-w-6xl mx-auto px-4 gap-8 md:gap-12 lg:gap-16">
+          {/* Image Section (Left) */}
+          <div className="flex-1 flex justify-center">
+            <div className="max-w-xl bg-high rounded-md p-4">
+              <ImageDisplay
+                images={dtfCollections[dtfIndex]}
+                alt="DTF Banner"
+              />
+            </div>
+          </div>
+
+          {/* SVG + Text Section (Right) */}
+          <div className="flex-1 flex justify-center">
+            <div className="max-w-2xl text-center md:text-left">
+              <DTFsvg />
+
+              <p className="mt-4 text-lg text-textSecondary">
+                Our <span className="text-head font-bold">DTF Printing</span>{" "}
+                service ensures high-quality, vibrant prints on various
+                textiles. Perfect for t-shirts, hoodies, and other apparel, we
+                deliver long-lasting designs with precise color accuracy and
+                flexibility for small or bulk orders.
+              </p>
+
+              <p className="mt-2 text-lg text-textSecondary">
+                We serve schools, businesses, fashion designers, and individuals
+                seeking custom apparel with unique designs that stand out.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="">
           <ServiceGrid />
         </div>
