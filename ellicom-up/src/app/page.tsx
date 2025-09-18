@@ -354,7 +354,7 @@ export default function Home() {
         </div>
 
         {/* DIGITAL PRINTING */}
-        <div className="bg-sea hover:bg-gold w-full">
+        <div className="bg-coHead w-full">
           <div className="mx-auto max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl">
             <DigitalPrintingImage />
           </div>

@@ -15,11 +15,11 @@ export default function RootLayout({
         <SessionProviderWrapper>
           <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
         </SessionProviderWrapper>
-      </body>
 
-      <footer>
-        <AnimatedBranding />
-      </footer>
+        <footer>
+          <AnimatedBranding />
+        </footer>
+      </body>
     </html>
   );
 }
